@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module Main where
 
@@ -6,8 +7,10 @@ import           Data.GraphViz
 import           Data.GraphViz.Attributes.Complete hiding (paths)
 import           Data.GraphViz.Types.Generalised   as G
 import           Data.GraphViz.Types.Monadic
-import           Data.Text.Lazy                    as L hiding (head, length)
+import           Data.Text.Lazy                    as L hiding (head, length,
+                                                         map)
 import           Data.Word
+import           DiagramsTH
 import           System.Environment                (getArgs)
 import           WriteRunDot
 
@@ -32,70 +35,68 @@ rectangle    :: n -> Text -> Dot n
 rectangle    n l = node n [textLabel l, shape     BoxShape,                 Width 1, style filled, myColor 3]
 
 -- swagger object
-root, swagger, info, host, basePath, schemes, consumes, produces, paths, definitions,
-    parameters, responses, securityDefinitions, security, tags, externalDocs :: Dot L.Text
-root                = rectangle    "root"                "root"
-swagger             = rectangle    "swagger"             "swagger:str/R"
-info                = rectangle    "info"                "info/R"
-host                = rectangle    "host"                "host:str"
-basePath            = rectangle    "basePath"            "basePath:str"
-schemes             = rectangle    "schemes"             "schemes:[str]"
-consumes            = rectangle    "consumes"            "consumes:[str]"
-produces            = rectangle    "produces"            "produces:[str]"
-paths               = rectangle    "paths"               "paths/R"
-definitions         = rectangle    "definitions"         "definitions"
-parameters          = rectangle    "parameters"          "parameters"
-responses           = rectangle    "responses"           "responses"
-securityDefinitions = rectangle    "securityDefinitions" "securityDefinitions"
-security            = rectangle    "security"            "security"
-tags                = rectangle    "tags"                "tags"
-externalDocs        = rectangle    "externalDocs"        "externalDocs"
+mk [ ("root",                "root")
+   , ("swagger",             "swagger:str/R")
+   , ("info",                "info/R")
+   , ("host",                "host:str")
+   , ("basePath",            "basePath:str")
+   , ("schemes",             "schemes:[str]")
+   , ("consumes",            "consumes:[str]")
+   , ("produces",            "produces:[str]")
+   , ("paths",               "paths/R")
+   , ("definitions",         "definitions")
+   , ("parameters",          "parameters")
+   , ("responses",           "responses")
+   , ("securityDefinitions", "securityDefinitions")
+   , ("security",            "security")
+   , ("tags",                "tags")
+   , ("externalDocs",        "externalDocs")
+   ]
 
 -- info object
-iTitle, iDescription, iTermsOfService, iContact, iLicense, iVersion :: Dot L.Text
-iTitle              = rectangle    "iTitle"              "title:str/R"
-iDescription        = rectangle    "iDescription"        "description:str"
-iTermsOfService     = rectangle    "iTermsOfService"     "termOfService:str"
-iContact            = rectangle    "iContact"            "contact"
-iLicense            = rectangle    "iLicense"            "license"
-iVersion            = rectangle    "iVersion"            "version:str/R"
+mk [ ("iTitle",              "title:str/R")
+   , ("iDescription",        "description:str")
+   , ("iTermsOfService",     "termOfService:str")
+   , ("iContact",            "contact")
+   , ("iLicense",            "license")
+   , ("iVersion",            "version:str/R")
+   ]
 
 -- contact object
-cName, cUrl, cEmail :: Dot L.Text
-cName               = rectangle    "cName"               "name:str"
-cUrl                = rectangle    "cUrl"                "url:str"
-cEmail              = rectangle    "cEmail"              "email:str"
+mk [ ("cName",               "name:str")
+   , ("cUrl",                "url:str")
+   , ("cEmail",              "email:str")
+   ]
 
 -- license object
-lName, lUrl :: Dot L.Text
-lName               = rectangle    "lName"               "name:str/R"
-lUrl                = rectangle    "lUrl"                "url:str"
+mk [ ("lName",               "name:str/R")
+   , ("lUrl",                "url:str")
+   ]
 
 -- paths object
-pPath :: Dot L.Text
-pPath               = rectangle    "pPath"               "/{path}"
+mk [ ("pPath",               "/{path}")
+   ]
 
 -- path item object
-piRef, piOperation, piParameters :: Dot L.Text
-piRef               = rectangle    "piRef"               "$ref:str"
-piOperation         = rectangle    "piOperation"         "get,put,post,\ndelete,options\nhead,patch"
-piParameters        = rectangle    "piParameters"        "parameters"
+mk [ ("piRef",               "$ref:str")
+   , ("piOperation",         "get,put,post,\ndelete,options\nhead,patch")
+   , ("piParameters",        "parameters")
+   ]
 
 -- operation object
-oTags, oSummary, oDescription, oExternalDocs, oOperationId, oConsumes, oProduces, oParameters,
-    oResponses, oSchemes, oDeprecated, oSecurity :: Dot L.Text
-oTags               = rectangle    "oTags"               "tags:[str]"
-oSummary            = rectangle    "oSummary"            "summary:str"
-oDescription        = rectangle    "oDescription"        "description:str"
-oExternalDocs       = rectangle    "oExternalDocs"       "externalDocs"
-oOperationId        = rectangle    "oOperationId"        "operationId:str"
-oConsumes           = rectangle    "oConsumes"           "consumes:[str]"
-oProduces           = rectangle    "oProduces"           "produces:[str]"
-oParameters         = rectangle    "oParameters"         "parameters"
-oResponses          = rectangle    "oResponses"          "responses/R"
-oSchemes            = rectangle    "oSchemes"            "schemes:[str]"
-oDeprecated         = rectangle    "oDeprecated"         "deprecated:bool"
-oSecurity           = rectangle    "oSecurity"           "security"
+mk [ ("oTags",               "tags:[str]")
+   , ("oSummary",            "summary:str")
+   , ("oDescription",        "description:str")
+   , ("oExternalDocs",       "externalDocs")
+   , ("oOperationId",        "operationId:str")
+   , ("oConsumes",           "consumes:[str]")
+   , ("oProduces",           "produces:[str]")
+   , ("oParameters",         "parameters")
+   , ("oResponses",          "responses/R")
+   , ("oSchemes",            "schemes:[str]")
+   , ("oDeprecated",         "deprecated:bool")
+   , ("oSecurity",           "security")
+   ]
 
 -- NEXT external documentation object
 

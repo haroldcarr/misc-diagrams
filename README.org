@@ -1,4 +1,5 @@
 ghci -XTemplateHaskell
+:set -XTemplateHaskell
 :m + Language.Haskell.TH
 
 :{
