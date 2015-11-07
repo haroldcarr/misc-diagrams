@@ -3,16 +3,22 @@
 
 module Main where
 
-import           Data.GraphViz
-import           Data.GraphViz.Attributes.Complete hiding (paths)
-import           Data.GraphViz.Types.Generalised   as G
-import           Data.GraphViz.Types.Monadic
-import           Data.Text.Lazy                    as L hiding (head, length,
-                                                         map)
-import           Data.Word
-import           DiagramsTH
+import           Data.GraphViz                     (GraphID (Str), Shape (BoxShape, Circle, DoubleCircle),
+                                                    filled, shape, style,
+                                                    textLabel)
+import           Data.GraphViz.Attributes.Complete (Attribute (Color, FixedSize, RankDir, Width),
+                                                    Color (RGB), ColorList (..),
+                                                    NodeSize (SetNodeSize),
+                                                    RankDir (FromLeft),
+                                                    toColorList)
+import           Data.GraphViz.Types.Generalised   as G (DotGraph)
+import           Data.GraphViz.Types.Monadic       (Dot, digraph, edge,
+                                                    graphAttrs, node, (-->))
+import           Data.Text.Lazy                    (Text)
+import           Data.Word                         (Word8)
+import           DiagramsTH                        (mk)
 import           System.Environment                (getArgs)
-import           WriteRunDot
+import           WriteRunDot                       (doDots)
 
 -- http://www.colorcombos.com/color-schemes/2025/ColorCombo2025.html
 myColorCL :: Word8 -> ColorList
@@ -98,9 +104,14 @@ mk [ ("oTags",               "tags:[str]")
    , ("oSecurity",           "security")
    ]
 
--- NEXT external documentation object
+-- external documentation object
+mk [ ("edDescription",       "description:str")
+   , ("edUrl",               "url:str/R")
+   ]
 
-swagger20 :: G.DotGraph L.Text
+-- NEXT parameter object
+
+swagger20 :: G.DotGraph Text
 swagger20 = digraph (Str "swagger20") $ do
 
     graphAttrs [RankDir FromLeft]
@@ -119,6 +130,8 @@ swagger20 = digraph (Str "swagger20") $ do
 
     oTags; oSummary; oDescription; oExternalDocs; oOperationId; oConsumes; oProduces; oParameters;
     oResponses; oSchemes; oDeprecated; oSecurity;
+
+    edDescription; edUrl;
 
     "root"             --> "swagger"
     "root"             --> "info"
@@ -168,6 +181,9 @@ swagger20 = digraph (Str "swagger20") $ do
     "piOperation"      --> "oSchemes"
     "piOperation"      --> "oDeprecated"
     "piOperation"      --> "oSecurity"
+
+    "oExternalDocs"    --> "edDescription"
+    "oExternalDocs"    --> "edUrl"
 
 main :: IO ()
 main = do
