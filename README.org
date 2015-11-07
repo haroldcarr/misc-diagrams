@@ -1,0 +1,12 @@
+ghci -XTemplateHaskell
+:m + Language.Haskell.TH
+
+:{
+runQ [d| root                = rectangle    "rootName"                "rootLabel"
+         rootX               = rectangle    "rootName"                "rootLabel" |]
+:}
+
+runQ [d| testing   = "rootName" ++ "rootLabel"     |]
+runQ [d| testing x = "rootName" ++ "rootLabel" ++ x|]
+
+runQ [| \x -> Prelude.concat [[1::Integer],[x]] |]
