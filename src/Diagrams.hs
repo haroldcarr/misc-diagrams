@@ -111,6 +111,10 @@ mk [ ("edDescription",       "description:str")
 
 -- NEXT parameter object
 
+(-->*)       :: n -> [n] -> Dot n
+f -->*   [t]  = f --> t
+f -->* (t:ts) = f --> t >> f -->* ts
+
 swagger20 :: G.DotGraph Text
 swagger20 = digraph (Str "swagger20") $ do
 
@@ -133,57 +137,24 @@ swagger20 = digraph (Str "swagger20") $ do
 
     edDescription; edUrl;
 
-    "root"             --> "swagger"
-    "root"             --> "info"
-    "root"             --> "host"
-    "root"             --> "basePath"
-    "root"             --> "schemes"
-    "root"             --> "consumes"
-    "root"             --> "produces"
-    "root"             --> "paths"
-    "root"             --> "definitions"
-    "root"             --> "parameters"
-    "root"             --> "responses"
-    "root"             --> "securityDefinitions"
-    "root"             --> "security"
-    "root"             --> "tags"
-    "root"             --> "externalDocs"
+    "root"             -->* [ "swagger", "info", "host", "basePath", "schemes", "consumes", "produces"
+                            , "paths", "definitions", "parameters", "responses", "securityDefinitions"
+                            , "security", "tags", "externalDocs" ]
+    "info"             -->* [ "iTitle", "iDescription", "iTermsOfService"
+                            , "iContact", "iLicense", "iVersion" ]
+    "iContact"         -->* [ "cName", "cUrl", "cEmail" ]
+    "iLicense"         -->* [ "lName", "lUrl" ]
 
-    "info"             --> "iTitle"
-    "info"             --> "iDescription"
-    "info"             --> "iTermsOfService"
-    "info"             --> "iContact"
-    "info"             --> "iLicense"
-    "info"             --> "iVersion"
+    edge "paths"            "pPath"         [textLabel "*"]
 
-    "iContact"         --> "cName"
-    "iContact"         --> "cUrl"
-    "iContact"         --> "cEmail"
+    "pPath"            -->  "piRef"
+    edge "pPath"            "piOperation"   [textLabel "*"]
+    "pPath"            -->  "piParameters"
 
-    "iLicense"         --> "lName"
-    "iLicense"         --> "lUrl"
-
-    edge "paths"           "pPath"         [textLabel "*"]
-
-    "pPath"            --> "piRef"
-    edge "pPath"           "piOperation"   [textLabel "*"]
-    "pPath"            --> "piParameters"
-
-    "piOperation"      --> "oTags"
-    "piOperation"      --> "oSummary"
-    "piOperation"      --> "oDescription"
-    "piOperation"      --> "oExternalDocs"
-    "piOperation"      --> "oOperationId"
-    "piOperation"      --> "oConsumes"
-    "piOperation"      --> "oProduces"
-    "piOperation"      --> "oParameters"
-    "piOperation"      --> "oResponses"
-    "piOperation"      --> "oSchemes"
-    "piOperation"      --> "oDeprecated"
-    "piOperation"      --> "oSecurity"
-
-    "oExternalDocs"    --> "edDescription"
-    "oExternalDocs"    --> "edUrl"
+    "piOperation"      -->* [ "oTags", "oSummary", "oDescription", "oExternalDocs", "oOperationId"
+                            , "oConsumes", "oProduces", "oParameters", "oResponses", "oSchemes"
+                            , "oDeprecated", "oSecurity"]
+    "oExternalDocs"    -->* ["edDescription", "edUrl"]
 
 main :: IO ()
 main = do
