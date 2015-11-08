@@ -109,7 +109,14 @@ mk [ ("edDescription",       "description:str")
    , ("edUrl",               "url:str/R")
    ]
 
--- NEXT parameter object
+-- parameter object
+mk [ ("prmName",             "name:str/R")
+   , ("prmIn",               "query,header,path\nformData,body/R")
+   , ("prmDescription",      "description:str")
+   , ("prmRequired",         "required:bool/R*in")
+   ]
+
+-- NEXT If in is "body"
 
 (-->*)       :: n -> [n] -> Dot n
 f -->*   [t]  = f --> t
@@ -135,6 +142,8 @@ swagger20 = digraph (Str "swagger20") $ do
     oTags; oSummary; oDescription; oExternalDocs; oOperationId; oConsumes; oProduces; oParameters;
     oResponses; oSchemes; oDeprecated; oSecurity;
 
+    prmName; prmIn; prmDescription; prmRequired;
+
     edDescription; edUrl;
 
     "root"             -->* [ "swagger", "info", "host", "basePath", "schemes", "consumes", "produces"
@@ -154,7 +163,8 @@ swagger20 = digraph (Str "swagger20") $ do
     "piOperation"      -->* [ "oTags", "oSummary", "oDescription", "oExternalDocs", "oOperationId"
                             , "oConsumes", "oProduces", "oParameters", "oResponses", "oSchemes"
                             , "oDeprecated", "oSecurity"]
-    "oExternalDocs"    -->* ["edDescription", "edUrl"]
+    "piParameters"     -->* [ "prmName", "prmIn", "prmDescription", "prmRequired" ]
+    "oExternalDocs"    -->* [ "edDescription", "edUrl"]
 
 main :: IO ()
 main = do
