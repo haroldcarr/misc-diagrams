@@ -6,13 +6,14 @@ module Main where
 import           Data.GraphViz                     (GraphID (Str), Shape (BoxShape, Circle, DoubleCircle),
                                                     filled, shape, style,
                                                     textLabel)
-import           Data.GraphViz.Attributes.Complete (Attribute (Color, FixedSize, RankDir, Width),
+import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, FixedSize, Label, LHead, RankDir, Width),
                                                     Color (RGB), ColorList (..),
+                                                    Label (StrLabel),
                                                     NodeSize (SetNodeSize),
                                                     RankDir (FromLeft),
                                                     toColorList)
 import           Data.GraphViz.Types.Generalised   as G (DotGraph)
-import           Data.GraphViz.Types.Monadic       (Dot, digraph, edge,
+import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
                                                     graphAttrs, node, (-->))
 import           Data.Text.Lazy                    (Text)
 import           Data.Word                         (Word8)
@@ -41,8 +42,7 @@ rectangle    :: n -> Text -> Dot n
 rectangle    n l = node n [textLabel l, shape     BoxShape,                 Width 1, style filled, myColor 3]
 
 -- swagger object
-mk [ ("root",                "root")
-   , ("swagger",             "swagger:str/R")
+mk [ ("swagger",             "swagger:str/R")
    , ("info",                "info/R")
    , ("host",                "host:str")
    , ("basePath",            "basePath:str")
@@ -125,46 +125,58 @@ f -->* (t:ts) = f --> t >> f -->* ts
 swagger20 :: G.DotGraph Text
 swagger20 = digraph (Str "swagger20") $ do
 
-    graphAttrs [RankDir FromLeft]
-    root; swagger; info; host; basePath; schemes; consumes; produces; paths; definitions;
-    parameters; responses; securityDefinitions; security; tags; externalDocs;
+    graphAttrs [RankDir FromLeft, Compound True]
+    cluster (Str "swaggerObject") $ do
+        graphAttrs [Label (StrLabel "swagger")]
+        swagger; info; host; basePath; schemes; consumes; produces; paths; definitions;
+        parameters; responses; securityDefinitions; security; tags; externalDocs;
 
-    iTitle; iDescription; iTermsOfService; iContact; iLicense; iVersion
+    cluster (Str "infoObject") $ do
+        graphAttrs [Label (StrLabel "info")]
+        iTitle; iDescription; iTermsOfService; iContact; iLicense; iVersion
 
-    cName; cUrl; cEmail;
+    cluster (Str "contactObject") $ do
+        graphAttrs [Label (StrLabel "contact")]
+        cName; cUrl; cEmail;
 
-    lName; lUrl;
+    cluster (Str "licenseObject") $ do
+        graphAttrs [Label (StrLabel "license")]
+        lName; lUrl;
 
-    pPath;
+    cluster (Str "pathsObject") $ do
+        graphAttrs [Label (StrLabel "paths")]
+        pPath;
 
-    piRef; piOperation; piParameters;
+    cluster (Str "pathItemObject") $ do
+        graphAttrs [Label (StrLabel "path item")]
+        piRef; piOperation; piParameters;
 
-    oTags; oSummary; oDescription; oExternalDocs; oOperationId; oConsumes; oProduces; oParameters;
-    oResponses; oSchemes; oDeprecated; oSecurity;
+    cluster (Str "operationObject") $ do
+        graphAttrs [Label (StrLabel "operation")]
+        oTags; oSummary; oDescription; oExternalDocs; oOperationId; oConsumes; oProduces; oParameters;
+        oResponses; oSchemes; oDeprecated; oSecurity;
 
-    prmName; prmIn; prmDescription; prmRequired;
+    cluster (Str "externalDocumentationObject") $ do
+        graphAttrs [Label (StrLabel "external documentation")]
+        edDescription; edUrl;
 
-    edDescription; edUrl;
+    cluster (Str "parameterObject") $ do
+        graphAttrs [Label (StrLabel "parameter")]
+        prmName; prmIn; prmDescription; prmRequired;
 
-    "root"             -->* [ "swagger", "info", "host", "basePath", "schemes", "consumes", "produces"
-                            , "paths", "definitions", "parameters", "responses", "securityDefinitions"
-                            , "security", "tags", "externalDocs" ]
-    "info"             -->* [ "iTitle", "iDescription", "iTermsOfService"
-                            , "iContact", "iLicense", "iVersion" ]
-    "iContact"         -->* [ "cName", "cUrl", "cEmail" ]
-    "iLicense"         -->* [ "lName", "lUrl" ]
+    edge "info"             "iTitle"        [LHead "cluster_infoObject"]
+    edge "iContact"         "cName"         [LHead "cluster_contactObject"]
+    edge "iLicense"         "lName"         [LHead "cluster_licenseObject"]
 
-    edge "paths"            "pPath"         [textLabel "*"]
+    edge "paths"            "pPath"         [LHead "cluster_pathsObject", textLabel "*"]
 
     "pPath"            -->  "piRef"
     edge "pPath"            "piOperation"   [textLabel "*"]
     "pPath"            -->  "piParameters"
 
-    "piOperation"      -->* [ "oTags", "oSummary", "oDescription", "oExternalDocs", "oOperationId"
-                            , "oConsumes", "oProduces", "oParameters", "oResponses", "oSchemes"
-                            , "oDeprecated", "oSecurity"]
-    "piParameters"     -->* [ "prmName", "prmIn", "prmDescription", "prmRequired" ]
-    "oExternalDocs"    -->* [ "edDescription", "edUrl"]
+    edge "piOperation"      "oTags"         [LHead "cluster_operationObject"]
+    edge "piParameters"     "prmName"       [LHead "cluster_parameterObject"]
+    edge "oExternalDocs"    "edDescription" [LHead "cluster_externalDocumentationObject"]
 
 main :: IO ()
 main = do
