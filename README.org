@@ -1,5 +1,6 @@
 How to run (in my broken Nix/Stack setup):
 
+#+BEGIN_EXAMPLE
 # fresh shell
 . hcRmUsrLocalBinFromPath.sh
 . hcRmNixFromPath.sh
@@ -7,11 +8,12 @@ stack build
 
 # fresh shell
 stack exec diagrams
-
+#+END_EXAMPLE
 
 -------------------
+TemplateHaskell notes
 
-
+#+BEGIN_EXAMPLE
 ghci -XTemplateHaskell
 :set -XTemplateHaskell
 :m + Language.Haskell.TH
@@ -25,3 +27,4 @@ runQ [d| testing   = "rootName" ++ "rootLabel"     |]
 runQ [d| testing x = "rootName" ++ "rootLabel" ++ x|]
 
 runQ [| \x -> Prelude.concat [[1::Integer],[x]] |]
+#+END_EXAMPLE
