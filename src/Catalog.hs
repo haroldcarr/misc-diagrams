@@ -1,6 +1,6 @@
 {-
 Created       : 2014 Jul 24 (Thu) 09:37:09 by Harold Carr.
-Last Modified : 2015 Nov 11 (Wed) 19:33:19 by Harold Carr.
+Last Modified : 2015 Nov 11 (Wed) 19:43:39 by Harold Carr.
 -}
 
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -70,7 +70,7 @@ queryableStore = digraph (Str "queryableStore") $ do
 
 main :: IO ()
 main =
-    doDots' Fdp -- TwoPi -- Fdp
+    doDots' "/tmp" Fdp -- TwoPi -- Fdp
             [ ("queryableStore" , queryableStore)
             ]
 

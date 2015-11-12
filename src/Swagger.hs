@@ -3,15 +3,16 @@
 
 module Main where
 
-import           Data.GraphViz                     (GraphID (Str), Shape (BoxShape, Circle, DoubleCircle),
-                                                    filled, shape, style,
-                                                    textLabel)
+import           Data.GraphViz                     (GraphID (Str),
+                                                    Shape (BoxShape), filled,
+                                                    shape, style, textLabel)
 import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, FixedSize, Label, LHead, RankDir, Width),
                                                     Color (RGB), ColorList (..),
                                                     Label (StrLabel),
                                                     NodeSize (SetNodeSize),
                                                     RankDir (FromLeft),
                                                     toColorList)
+import           Data.GraphViz.HC.Util             (doDots)
 import           Data.GraphViz.Types.Generalised   as G (DotGraph)
 import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
                                                     graphAttrs, node, (-->))
@@ -19,7 +20,6 @@ import           Data.Text.Lazy                    (Text)
 import           Data.Word                         (Word8)
 import           DiagramsTH                        (mk)
 import           System.Environment                (getArgs)
-import           WriteRunDot                       (doDots)
 
 -- http://www.colorcombos.com/color-schemes/2025/ColorCombo2025.html
 myColorCL :: Word8 -> ColorList
@@ -29,17 +29,11 @@ myColorCL n | n == 1 = c (RGB 127 108 138)
             | n == 4 = c (RGB 172 126 100)
  where c rgb = toColorList [rgb]
 
-myColor :: Word8 -> Attribute
+myColor  :: Word8 -> Attribute
 myColor n = Color $ myColorCL n
 
-doubleCircle :: n -> Text -> Dot n
-doubleCircle n l = node n [textLabel l, shape DoubleCircle, FixedSize SetNodeSize, Width 1, style filled, myColor 1]
-
-circle       :: n -> Text -> Dot n
-circle       n l = node n [textLabel l, shape       Circle, FixedSize SetNodeSize, Width 1, style filled, myColor 1]
-
 rectangle    :: n -> Text -> Dot n
-rectangle    n l = node n [textLabel l, shape     BoxShape,                 Width 1, style filled, myColor 3]
+rectangle n l = node n [textLabel l, shape BoxShape,  Width 1, style filled, myColor 3]
 
 -- swagger object
 mk [ ("swagger",             "swagger:str/R")
