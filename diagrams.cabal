@@ -19,9 +19,9 @@ executable catalog
   main-is:             Catalog.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
+                     , data-graphviz-hc-util
                      , filepath
                      , graphviz
-                     , template-haskell
                      , text
   other-modules:       DiagramsTH
                      , WriteRunDot
