@@ -14,9 +14,22 @@ library
                      , graphviz
   default-language:    Haskell2010
 
-executable diagrams
+executable catalog
   hs-source-dirs:      src
-  main-is:             Diagrams.hs
+  main-is:             Catalog.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , filepath
+                     , graphviz
+                     , template-haskell
+                     , text
+  other-modules:       DiagramsTH
+                     , WriteRunDot
+  default-language:    Haskell2010
+
+executable swagger
+  hs-source-dirs:      src
+  main-is:             Swagger.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , filepath

@@ -1,3 +1,17 @@
+How to run (in my broken Nix/Stack setup):
+
+# fresh shell
+. hcRmUsrLocalBinFromPath.sh
+. hcRmNixFromPath.sh
+stack build
+
+# fresh shell
+stack exec diagrams
+
+
+-------------------
+
+
 ghci -XTemplateHaskell
 :set -XTemplateHaskell
 :m + Language.Haskell.TH
