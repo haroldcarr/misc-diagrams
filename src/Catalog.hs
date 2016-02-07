@@ -1,8 +1,9 @@
 {-
 Created       : 2014 Jul 24 (Thu) 09:37:09 by Harold Carr.
-Last Modified : 2015 Nov 11 (Wed) 20:19:24 by Harold Carr.
+Last Modified : 2016 Feb 07 (Sun) 06:30:58 by Harold Carr.
 -}
 
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
