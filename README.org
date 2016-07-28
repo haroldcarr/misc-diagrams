@@ -1,13 +1,6 @@
-How to run (in my broken Nix/Stack setup):
-
 #+BEGIN_EXAMPLE
-# fresh shell
-. hcRmUsrLocalBinFromPath.sh
-. hcRmNixFromPath.sh
 stack build
-
-# fresh shell
-stack exec diagrams
+stack exec juno
 #+END_EXAMPLE
 
 -------------------
