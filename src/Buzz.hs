@@ -4,7 +4,7 @@
 
 {-
 Created       : 2014 Feb 26 (Wed) 18:54:30 by Harold Carr.
-Last Modified : 2015 Nov 11 (Wed) 20:32:05 by Harold Carr.
+Last Modified : 2016 Jul 29 (Fri) 10:49:17 by Harold Carr.
 -}
 
 module Main where
@@ -19,7 +19,8 @@ import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Fixed
                                                          Number (Int),
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots, pastel28)
+import           Data.GraphViz.HC.Util                  (doDots, pastel28,
+                                                         startEndClosedState, state, transition, decision)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
                                                          GraphID (Str, Num),
@@ -30,21 +31,6 @@ import qualified Data.Text                              as T (Text)
 import           Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
 default (T.Text)
-
-------------------------------------------------------------------------------
--- DIAGRAM HELPER FUNCTIONS
-
-startEndClosedState                 :: L.Text -> L.Text -> Dot L.Text
-startEndClosedState n l             = node n [textLabel l, shape DoubleCircle, pastel28 1, style filled, FixedSize SetNodeSize, Width 1]
-
-state                               :: L.Text -> L.Text -> Dot L.Text
-state               n l             = node n [textLabel l, shape       Circle, pastel28 2, style filled, FixedSize SetNodeSize, Width 1]
-
-transition                          :: L.Text -> L.Text -> Dot L.Text
-transition          n l             = node n [textLabel l, shape     BoxShape, pastel28 5, style filled]
-
-decision                            :: L.Text -> L.Text -> Dot L.Text
-decision            n l             = node n [textLabel l, shape DiamondShape, pastel28 6, style filled, FixedSize SetNodeSize, Width 1.5, Height 1.5]
 
 ------------------------------------------------------------------------------
 -- STATES
