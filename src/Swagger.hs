@@ -14,12 +14,12 @@ import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, 
                                                     RankDir (FromLeft),
                                                     toColorList)
 import           Data.GraphViz.HC.Util             (colorCombo2025, doDots, uRectangle)
+import           Data.GraphViz.HC.DiagramsTH       (mk)
 import           Data.GraphViz.Types.Generalised   as G (DotGraph)
 import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
                                                     graphAttrs, node, (-->))
 import           Data.Text.Lazy                    (Text)
 import           Data.Word                         (Word8)
-import           DiagramsTH                        (mk)
 import           System.Environment                (getArgs)
 
 rectangle    :: n -> Text -> Dot n

@@ -46,7 +46,6 @@ executable juno
                      , graphviz
                      , template-haskell
                      , text
-  other-modules:       DiagramsTH
   default-language:    Haskell2010
 
 executable swagger
@@ -59,7 +58,6 @@ executable swagger
                      , graphviz
                      , template-haskell
                      , text
-  other-modules:       DiagramsTH
   default-language:    Haskell2010
 
 executable threepenny

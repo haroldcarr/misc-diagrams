@@ -17,6 +17,7 @@ import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Fixed
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
 import           Data.GraphViz.HC.Util                  (doDots, uRectangle)
+import           Data.GraphViz.HC.DiagramsTH            (mk)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
                                                          GraphID (Str, Num),
@@ -26,7 +27,6 @@ import           Data.GraphViz.Types.Monadic            (Dot,
 import qualified Data.Text                              as T (Text)
 import           Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
-import           DiagramsTH                             (mk)
 default (T.Text)
 
 ------------------------------------------------------------------------------
