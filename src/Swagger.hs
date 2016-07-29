@@ -13,7 +13,7 @@ import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, 
                                                     NodeSize (SetNodeSize),
                                                     RankDir (FromLeft),
                                                     toColorList)
-import           Data.GraphViz.HC.Util             (doDots)
+import           Data.GraphViz.HC.Util             (colorCombo2025, doDots, uRectangle)
 import           Data.GraphViz.Types.Generalised   as G (DotGraph)
 import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
                                                     graphAttrs, node, (-->))
@@ -22,22 +22,12 @@ import           Data.Word                         (Word8)
 import           DiagramsTH                        (mk)
 import           System.Environment                (getArgs)
 
--- http://www.colorcombos.com/color-schemes/2025/ColorCombo2025.html
-myColorCL :: Word8 -> ColorList
-myColorCL n | n == 1 = c (RGB 127 108 138)
-            | n == 2 = c (RGB 175 177 112)
-            | n == 3 = c (RGB 226 206 179)
-            | n == 4 = c (RGB 172 126 100)
- where c rgb = toColorList [rgb]
-
-myColor  :: Word8 -> Attribute
-myColor n = Color $ myColorCL n
-
 rectangle    :: n -> Text -> Dot n
-rectangle n l = node n [textLabel l, shape BoxShape,  Width 1, style filled, myColor 3]
+rectangle     = uRectangle []
 
 -- swagger object
-mk [ ("swagger",             "swagger:str/R")
+mk "rectangle"
+   [ ("swagger",             "swagger:str/R")
    , ("info",                "info/R")
    , ("host",                "host:str")
    , ("basePath",            "basePath:str")
@@ -55,7 +45,8 @@ mk [ ("swagger",             "swagger:str/R")
    ]
 
 -- info object
-mk [ ("iTitle",              "title:str/R")
+mk "rectangle"
+   [ ("iTitle",              "title:str/R")
    , ("iDescription",        "description:str")
    , ("iTermsOfService",     "termOfService:str")
    , ("iContact",            "contact")
@@ -64,28 +55,33 @@ mk [ ("iTitle",              "title:str/R")
    ]
 
 -- contact object
-mk [ ("cName",               "name:str")
+mk "rectangle"
+   [ ("cName",               "name:str")
    , ("cUrl",                "url:str")
    , ("cEmail",              "email:str")
    ]
 
 -- license object
-mk [ ("lName",               "name:str/R")
+mk "rectangle"
+   [ ("lName",               "name:str/R")
    , ("lUrl",                "url:str")
    ]
 
 -- paths object
-mk [ ("pPath",               "/{path}")
+mk "rectangle"
+   [ ("pPath",               "/{path}")
    ]
 
 -- path item object
-mk [ ("piRef",               "$ref:str")
+mk "rectangle"
+   [ ("piRef",               "$ref:str")
    , ("piOperation",         "get,put,post,\ndelete,options\nhead,patch")
    , ("piParameters",        "parameters")
    ]
 
 -- operation object
-mk [ ("oTags",               "tags:[str]")
+mk "rectangle"
+   [ ("oTags",               "tags:[str]")
    , ("oSummary",            "summary:str")
    , ("oDescription",        "description:str")
    , ("oExternalDocs",       "externalDocs")
@@ -100,22 +96,20 @@ mk [ ("oTags",               "tags:[str]")
    ]
 
 -- external documentation object
-mk [ ("edDescription",       "description:str")
+mk "rectangle"
+   [ ("edDescription",       "description:str")
    , ("edUrl",               "url:str/R")
    ]
 
 -- parameter object
-mk [ ("prmName",             "name:str/R")
+mk "rectangle"
+   [ ("prmName",             "name:str/R")
    , ("prmIn",               "query,header,path\nformData,body/R")
    , ("prmDescription",      "description:str")
    , ("prmRequired",         "required:bool/R*in")
    ]
 
 -- NEXT If in is "body"
-
-(-->*)       :: n -> [n] -> Dot n
-f -->*   [t]  = f --> t
-f -->* (t:ts) = f --> t >> f -->* ts
 
 swagger20 :: G.DotGraph Text
 swagger20 = digraph (Str "swagger20") $ do

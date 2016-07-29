@@ -16,7 +16,7 @@ import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Fixed
                                                          Number (Int),
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots)
+import           Data.GraphViz.HC.Util                  (doDots, uRectangle)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
                                                          GraphID (Str, Num),
@@ -59,12 +59,13 @@ decision                            :: L.Text -> L.Text -> Dot L.Text
 decision            n l             = node n [textLabel l, shape DiamondShape, pastel28 6, style filled, FixedSize SetNodeSize, Width 1.5, Height 1.5]
 
 rectangle    :: n -> Text -> Dot n
-rectangle n l = node n [textLabel l, shape BoxShape,  Width 1, style filled, myColor 3]
+rectangle     = uRectangle []
 
 ------------------------------------------------------------------------------
 -- SERVER
 
-mk [ -- Apps.Juno.Server main
+mk "rectangle"
+   [ -- Apps.Juno.Server main
      ("junoEnv", "JunoEnv")
    , ("toCommands","toCommands")
    , ("fromCommands","fromCommands")
@@ -153,7 +154,6 @@ junoServer = digraph (Str "junoServer") $ do
 
     edge "outboxRead"       "zmqSocketPush" [textLabel "map send rolodex"]
 
-    
 main :: IO ()
 main =
     doDots "/tmp"
