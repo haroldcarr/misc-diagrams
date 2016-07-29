@@ -19,7 +19,7 @@ import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Fixed
                                                          Number (Int),
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots)
+import           Data.GraphViz.HC.Util                  (doDots, pastel28)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
                                                          GraphID (Str, Num),
@@ -33,9 +33,6 @@ default (T.Text)
 
 ------------------------------------------------------------------------------
 -- DIAGRAM HELPER FUNCTIONS
-
-pastel28                            :: Word8 -> Attribute
-pastel28 n                          = Color (toColorList [toColor (BC (BScheme Pastel2 8) n)])
 
 startEndClosedState                 :: L.Text -> L.Text -> Dot L.Text
 startEndClosedState n l             = node n [textLabel l, shape DoubleCircle, pastel28 1, style filled, FixedSize SetNodeSize, Width 1]
