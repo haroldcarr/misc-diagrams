@@ -1,6 +1,10 @@
 #+BEGIN_EXAMPLE
 stack build
 stack exec juno
+# if get:
+juno: dot: runInteractiveProcess: runInteractiveProcess: exec: does not exist (No such file or directory)
+# then
+brew install graphviz
 #+END_EXAMPLE
 
 -------------------
