@@ -4,7 +4,7 @@
 
 {-
 Created       : 2014 Feb 26 (Wed) 18:54:30 by Harold Carr.
-Last Modified : 2016 Jul 29 (Fri) 10:49:17 by Harold Carr.
+Last Modified : 2016 Jul 30 (Sat) 08:17:06 by Harold Carr.
 -}
 
 module Main where
@@ -27,10 +27,8 @@ import           Data.GraphViz.Types.Monadic            (Dot,
                                                          cluster, digraph, edge,
                                                          graphAttrs, node,
                                                          (-->))
-import qualified Data.Text                              as T (Text)
 import           Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
-default (T.Text)
 
 ------------------------------------------------------------------------------
 -- STATES
