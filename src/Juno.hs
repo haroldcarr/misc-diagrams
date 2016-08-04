@@ -122,6 +122,13 @@ junoServer = digraph (Str "junoServer") $ do
     "runCommand"     -->    "applyFn"
     --   Juno.Spec.Simple runJuno
 
+    "inboxWrite" --> "inboxRead"
+    "cmdInboxWrite" --> "cmdInboxRead"
+    "aerInboxWrite" --> "aerInboxRead"
+    "rvAndRvrWrite" --> "rvAndRvrRead"
+    "outboxWrite" --> "outboxRead"
+    "eventWrite" --> "eventRead"
+
     "inboxRead" --> "raftSpec"
     "cmdInboxRead" --> "raftSpec"
     "aerInboxRead" --> "raftSpec"
