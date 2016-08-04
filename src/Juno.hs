@@ -93,16 +93,31 @@ mk "rectangle"
      -- Juno.Runtime.Api.ApiServer
    , ("runApiServer","runApiServer")
    , ("apiEnv", "ApiEnv")
-     -- Juno.Spec.Simple simpleRaftSpec
-   , ("raftSpec","RaftSpec")
      -- ?
    , ("updateCmdMapFn", "updateCmdMapFn")
-     -- Juno.Runtime.MessageReceiver
+     -- ReceiverEnv : Juno.Runtime.MessageReceiver
    , ("getMessages", "getMessages")
    , ("getNewCommands", "getNewCommands")
    , ("getNewEvidence", "getNewEvidence")
    , ("getRvAndRVRs", "getRvAndRVRs")
    , ("enqueue", "enqueue")
+     -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
+   , ("applyLogEntry", "applyLogEntry")
+   , ("sendMessage", "sendMessage")
+   , ("sendMessages", "sendMessages")
+   , ("getMessage", "getMessage")
+   , ("getMessagesRS", "getMessages")
+   , ("getNewCommandsRS", "getNewCommands")
+   , ("getNewEvidenceRS", "getNewEvidence")
+   , ("getRvAndRVRsRS", "getRvAndRVRs")
+   , ("publishMetric", "publishMetric")
+   , ("enqueueRS", "enqueue")
+   , ("enqueueMultiple", "enqueueMultiple")
+   , ("enqueueLater", "enqueueLater")
+   , ("dequeue", "dequeue")
+   , ("updateCmdMap", "updateCmdMap")
+   , ("cmdStatusMap", "cmdStatusMap")
+   , ("dequeueFromApi", "dequeueFromApi")
    ]
 
 junoServer :: G.DotGraph L.Text
@@ -110,6 +125,12 @@ junoServer = digraph (Str "junoServer") $ do
     cluster (Str "ReceiverEnvBox") $ do
         graphAttrs [Label (StrLabel "ReceiverEnv")]
         getMessages; getNewCommands; getNewEvidence; getRvAndRVRs; enqueue
+
+    cluster (Str "RaftSpecBox") $ do
+        graphAttrs [Label (StrLabel "RaftSpec")]
+        applyLogEntry; sendMessage; sendMessages; getMessage; getMessagesRS; getNewCommandsRS; getNewEvidenceRS;
+        getRvAndRVRsRS; publishMetric; enqueueRS; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
+        cmdStatusMap; dequeueFromApi;
 
     graphAttrs [RankDir FromLeft]
     junoEnv; runCommand; applyFn
@@ -125,9 +146,10 @@ junoServer = digraph (Str "junoServer") $ do
     runCommand; applyFn;
     commandMVarMap;
     runApiServer; apiEnv;
-    pubMetric; updateCmdMapFn; raftSpec;
+    pubMetric; updateCmdMapFn;
 
     -- Apps.Juno.Server main
+    "toCommands"     -->    "fromCommands"
     "junoEnv"        -->    "runCommand"
     "runCommand"     -->    "applyFn"
     --   Juno.Spec.Simple runJuno
@@ -139,38 +161,35 @@ junoServer = digraph (Str "junoServer") $ do
     "outboxWrite" --> "outboxRead"
     "eventWrite" --> "eventRead"
 
-    "inboxRead" --> "raftSpec"
-    "cmdInboxRead" --> "raftSpec"
-    "aerInboxRead" --> "raftSpec"
-    "rvAndRvrRead" --> "raftSpec"
-    "outboxWrite" --> "raftSpec"
-    "eventRead" --> "raftSpec"
-    "eventWrite" --> "raftSpec"
-    "applyFn" --> "raftSpec"
-    "pubMetric" --> "raftSpec"
-    "updateCmdMapFn" --> "raftSpec"
-    "commandMVarMap" --> "raftSpec"
-    "fromCommands" --> "raftSpec"
+    -- raftSpec
+    "applyFn" --> "applyLogEntry"
+    "sendMessage" --> "outboxWrite"
+    "sendMessages" --> "outboxWrite"
+    "inboxRead" --> "getMessage"
+    "inboxRead" --> "getMessagesRS"
+    "cmdInboxRead" --> "getNewCommandsRS"
+    "aerInboxRead" --> "getNewEvidenceRS"
+    "rvAndRvrRead" --> "getRvAndRVRsRS"
+    "pubMetric" --> "publishMetric"
+    "enqueueRS" --> "eventWrite"
+    "enqueueMultiple" --> "eventWrite"
+    "enqueueLater" --> "eventWrite"
+    "eventRead" --> "dequeue"
+    "updateCmdMapFn" --> "updateCmdMap"
+    "commandMVarMap" --> "cmdStatusMap"
+    "fromCommands" --> "dequeueFromApi"
 
-    {-
-    "inboxRead" --> "receiverEnv"
-    "cmdInboxRead" --> "receiverEnv"
-    "aerInboxRead" --> "receiverEnv"
-    "rvAndRvrRead" --> "receiverEnv"
-    "eventWrite" --> "receiverEnv"
-    -}
-
-    -- MessageReceiver / Simple
+    -- ReceiverEnv : MessageReceiver / Simple
     "inboxRead" --> "getMessages"
     "cmdInboxRead" --> "getNewCommands"
     "aerInboxRead" --> "getNewEvidence"
     "rvAndRvrRead" --> "getRvAndRVRs"
-    "eventWrite" --> "enqueue"
+    "enqueue" --> "eventWrite"
 
     --     Juno.Runtime.Api.ApiServer
-    "toCommands"     -->    "runApiServer"
-    "commandMVarMap" -->    "runApiServer"
-    "runApiServer"   -->    "apiEnv"
+    "commandMVarMap" --> "runApiServer"
+    "runApiServer"   --> "toCommands"
+    "apiEnv" --> "runApiServer"
 
     --     Juno.Messaging.ZMQ runMsgServer
     edge "zmqSocketPull"    "rvAndRvrWrite" [textLabel "RV | RVR"]
@@ -178,7 +197,7 @@ junoServer = digraph (Str "junoServer") $ do
     edge "zmqSocketPull"    "aerInboxWrite" [textLabel "AER"]
     edge "zmqSocketPull"    "inboxWrite"    [textLabel "otherwise"]
 
-    edge "outboxRead"       "zmqSocketPush" [textLabel "map send rolodex"]
+    edge "outboxRead"       "zmqSocketPush" [textLabel "send rolodex"]
 
 main :: IO ()
 main =
