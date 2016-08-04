@@ -10,8 +10,9 @@ import           Data.GraphViz                          (filled, shape, style,
 import           Data.GraphViz.Attributes.Colors.Brewer (BrewerColor (BC),
                                                          BrewerName (Pastel2),
                                                          BrewerScheme (BScheme))
-import           Data.GraphViz.Attributes.Complete      (Attribute (Color, FixedSize, Height, RankDir, Width),
+import           Data.GraphViz.Attributes.Complete      (Attribute (Color, FixedSize, Height, Label, RankDir, Width),
                                                          Color (RGB), ColorList (..),
+                                                         Label (StrLabel),
                                                          NodeSize (SetNodeSize),
                                                          Number (Int),
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
@@ -95,12 +96,21 @@ mk "rectangle"
      -- Juno.Spec.Simple simpleRaftSpec
    , ("raftSpec","RaftSpec")
      -- ?
-   , ("receiverEnv", "ReceiverEnv")
    , ("updateCmdMapFn", "updateCmdMapFn")
+     -- Juno.Runtime.MessageReceiver
+   , ("getMessages", "getMessages")
+   , ("getNewCommands", "getNewCommands")
+   , ("getNewEvidence", "getNewEvidence")
+   , ("getRvAndRVRs", "getRvAndRVRs")
+   , ("enqueue", "enqueue")
    ]
 
 junoServer :: G.DotGraph L.Text
 junoServer = digraph (Str "junoServer") $ do
+    cluster (Str "ReceiverEnvBox") $ do
+        graphAttrs [Label (StrLabel "ReceiverEnv")]
+        getMessages; getNewCommands; getNewEvidence; getRvAndRVRs; enqueue
+
     graphAttrs [RankDir FromLeft]
     junoEnv; runCommand; applyFn
     inboxRead; inboxWrite;
@@ -115,7 +125,7 @@ junoServer = digraph (Str "junoServer") $ do
     runCommand; applyFn;
     commandMVarMap;
     runApiServer; apiEnv;
-    receiverEnv; pubMetric; updateCmdMapFn; raftSpec;
+    pubMetric; updateCmdMapFn; raftSpec;
 
     -- Apps.Juno.Server main
     "junoEnv"        -->    "runCommand"
@@ -142,11 +152,20 @@ junoServer = digraph (Str "junoServer") $ do
     "commandMVarMap" --> "raftSpec"
     "fromCommands" --> "raftSpec"
 
+    {-
     "inboxRead" --> "receiverEnv"
     "cmdInboxRead" --> "receiverEnv"
     "aerInboxRead" --> "receiverEnv"
     "rvAndRvrRead" --> "receiverEnv"
     "eventWrite" --> "receiverEnv"
+    -}
+
+    -- MessageReceiver / Simple
+    "inboxRead" --> "getMessages"
+    "cmdInboxRead" --> "getNewCommands"
+    "aerInboxRead" --> "getNewEvidence"
+    "rvAndRvrRead" --> "getRvAndRVRs"
+    "eventWrite" --> "enqueue"
 
     --     Juno.Runtime.Api.ApiServer
     "toCommands"     -->    "runApiServer"
