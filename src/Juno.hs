@@ -30,35 +30,6 @@ import           Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
 default (T.Text)
 
-------------------------------------------------------------------------------
--- DIAGRAM HELPER FUNCTIONS
-
--- http://www.colorcombos.com/color-schemes/2025/ColorCombo2025.html
-myColorCL :: Word8 -> ColorList
-myColorCL n | n == 1 = c (RGB 127 108 138)
-            | n == 2 = c (RGB 175 177 112)
-            | n == 3 = c (RGB 226 206 179)
-            | n == 4 = c (RGB 172 126 100)
-  where c rgb = toColorList [rgb]
-
-myColor  :: Word8 -> Attribute
-myColor n = Color $ myColorCL n
-
-pastel28                            :: Word8 -> Attribute
-pastel28 n                          = Color (toColorList [toColor (BC (BScheme Pastel2 8) n)])
-
-startEndClosedState                 :: L.Text -> L.Text -> Dot L.Text
-startEndClosedState n l             = node n [textLabel l, shape DoubleCircle, pastel28 1, style filled, FixedSize SetNodeSize, Width 1]
-
-state                               :: L.Text -> L.Text -> Dot L.Text
-state               n l             = node n [textLabel l, shape       Circle, pastel28 2, style filled, FixedSize SetNodeSize, Width 1]
-
-transition                          :: L.Text -> L.Text -> Dot L.Text
-transition          n l             = node n [textLabel l, shape     BoxShape, pastel28 5, style filled]
-
-decision                            :: L.Text -> L.Text -> Dot L.Text
-decision            n l             = node n [textLabel l, shape DiamondShape, pastel28 6, style filled, FixedSize SetNodeSize, Width 1.5, Height 1.5]
-
 rectangle    :: n -> Text -> Dot n
 rectangle     = uRectangle []
 
