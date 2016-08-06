@@ -80,10 +80,8 @@ mk "rectangle"
 
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
    , ("applyLogEntry", "applyLogEntry")
-   , ("sendMessage", "sendMessage")
-   , ("sendMessages", "sendMessages")
-   , ("getMessage", "getMessage")
-   , ("getMessagesRS", "getMessages")
+   , ("sendMessage", "sendMessage(s)")
+   , ("getMessageRS", "getMessage(s)")
    , ("getNewCommandsRS", "getNewCommands")
    , ("getNewEvidenceRS", "getNewEvidence")
    , ("getRvAndRVRsRS", "getRvAndRVRs")
@@ -95,6 +93,20 @@ mk "rectangle"
    , ("updateCmdMap", "updateCmdMap")
    , ("cmdStatusMap", "cmdStatusMap")
    , ("dequeueFromApi", "dequeueFromApi")
+
+     -- Juno.Consensus.Commit
+   , ("doCommit", "doCommit")
+
+     -- Juno.Runtime.Sender
+   , ("sendStar", "send*")
+
+     -- Juno.Runtime.MessageReceiver
+   , ("messageReceiver", "messageReceiver")
+
+     -- Juno.Consensus.Handle
+   , ("handleEvents", "handleEvents")
+   , ("handleRPC", "handleRPC")
+   , ("issueBatch", "issueBatch")
    ]
 
 junoServer :: G.DotGraph L.Text
@@ -105,9 +117,25 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "RaftSpecBox") $ do
         graphAttrs [Label (StrLabel "RaftSpec")]
-        applyLogEntry; sendMessage; sendMessages; getMessage; getMessagesRS; getNewCommandsRS; getNewEvidenceRS;
+        applyLogEntry; sendMessage; getMessageRS; getNewCommandsRS; getNewEvidenceRS;
         getRvAndRVRsRS; publishMetric; enqueueRS; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
         cmdStatusMap; dequeueFromApi;
+
+    cluster (Str "Commit.hsBox") $ do
+        graphAttrs [Label (StrLabel "Commit.hs")]
+        doCommit
+
+    cluster (Str "Sender.hsBox") $ do
+        graphAttrs [Label (StrLabel "Sender.hs")]
+        sendStar
+
+    cluster (Str "MessageReceiver.hsBox") $ do
+        graphAttrs [Label (StrLabel "MessageReceiver.hs")]
+        messageReceiver
+
+    cluster (Str "Handle.hsBox") $ do
+        graphAttrs [Label (StrLabel "Handle.hs")]
+        handleEvents; handleRPC; issueBatch
 
     graphAttrs [RankDir FromLeft]
     junoEnv; runCommand; applyFn
@@ -161,9 +189,7 @@ junoServer = digraph (Str "junoServer") $ do
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
     "applyLogEntry" --> "applyFn"
     "sendMessage" --> "outboxWrite"
-    "sendMessages" --> "outboxWrite"
-    "inboxRead" --> "getMessage"
-    "inboxRead" --> "getMessagesRS"
+    "inboxRead" --> "getMessageRS"
     "cmdInboxRead" --> "getNewCommandsRS"
     "aerInboxRead" --> "getNewEvidenceRS"
     "rvAndRvrRead" --> "getRvAndRVRsRS"
@@ -175,6 +201,26 @@ junoServer = digraph (Str "junoServer") $ do
     "updateCmdMapFn" --> "updateCmdMap"
     "commandMVarMap" --> "cmdStatusMap"
     "fromCommands" --> "dequeueFromApi"
+
+    -- Juno.Consensus.Commit
+    "doCommit" --> "applyLogEntry"
+
+    -- Juno.Runtime.Sender
+    "sendStar" --> "sendMessage"
+
+    -- Juno.Runtime.MessageReceiver
+    "getMessages" --> "messageReceiver"
+    "getNewCommands" --> "messageReceiver"
+    "getNewEvidence" --> "messageReceiver"
+    "getRvAndRVRs" --> "messageReceiver"
+    "messageReceiver" --> "enqueue"
+
+    -- Juno.Consensus.Handle
+    "dequeue" --> "handleEvents"
+    "handleEvents" --> "handleRPC"
+    edge "handleEvents" "issueBatch" [textLabel "if Leader"] -- condition is really inside `issueBatch`
+    "issueBatch" --> "doCommit"
+    -- NEXT: handleEvents and handleRPC fanout
 
 main :: IO ()
 main =
