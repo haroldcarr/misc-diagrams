@@ -38,12 +38,14 @@ rectangle     = uRectangle []
 
 mk "rectangle"
    [ -- Apps.Juno.Server main
-     ("junoEnv", "JunoEnv")
-   , ("toCommands","toCommands")
+     ("toCommands","toCommands")
    , ("fromCommands","fromCommands")
    , ("commandMVarMap","CommandMVarMap")
-   , ("runCommand", "runCommand")
    , ("applyFn","applyFn")
+
+     -- App.Juno.Command
+   , ("junoEnv", "JunoEnv")
+   , ("runCommand", "runCommand")
 
      -- Juno.Spec.Simple runJuno
    , ("inboxWrite","inboxWrite")
@@ -111,6 +113,10 @@ mk "rectangle"
 
 junoServer :: G.DotGraph L.Text
 junoServer = digraph (Str "junoServer") $ do
+    cluster (Str "Command.hsBox") $ do
+        graphAttrs [Label (StrLabel "Command.hs")]
+        junoEnv; runCommand
+
     cluster (Str "ReceiverEnvBox") $ do
         graphAttrs [Label (StrLabel "ReceiverEnv")]
         getMessages; getNewCommands; getNewEvidence; getRvAndRVRs; enqueue
@@ -138,7 +144,7 @@ junoServer = digraph (Str "junoServer") $ do
         handleEvents; handleRPC; issueBatch
 
     graphAttrs [RankDir FromLeft]
-    junoEnv; runCommand; applyFn
+    applyFn
     inboxRead; inboxWrite;
     outboxRead; outboxWrite;
     rvAndRvrRead; rvAndRvrWrite;
@@ -154,9 +160,9 @@ junoServer = digraph (Str "junoServer") $ do
     pubMetric; updateCmdMapFn;
 
     -- Apps.Juno.Server main
-    "toCommands"     -->    "fromCommands"
-    "junoEnv"        -->    "runCommand"
-    "runCommand"     -->    "applyFn"
+    "toCommands" --> "fromCommands"
+    "runCommand" --> "junoEnv"
+    "applyFn" --> "runCommand"
 
     -- Juno.Spec.Simple runJuno
     "inboxWrite" --> "inboxRead"
@@ -220,6 +226,7 @@ junoServer = digraph (Str "junoServer") $ do
     "handleEvents" --> "handleRPC"
     edge "handleEvents" "issueBatch" [textLabel "if Leader"] -- condition is really inside `issueBatch`
     "issueBatch" --> "doCommit"
+    edge "issueBatch" "sendStar" [textLabel "sendAllAppendEntries/Response"]
     -- NEXT: handleEvents and handleRPC fanout
 
 main :: IO ()
