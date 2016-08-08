@@ -93,7 +93,8 @@ mk "rectangle"
    , ("doCommit", "doCommit")
 
      -- Juno.Runtime.Sender
-   , ("sendStar", "send*")
+   , ("sendAppendEntries", "send(All)AppendEntries")
+   , ("sendAppendEntriesResponse", "send(All)AppendEntriesResponse")
 
      -- Juno.Runtime.MessageReceiver
    , ("messageReceiver", "messageReceiver")
@@ -130,13 +131,9 @@ junoServer = digraph (Str "junoServer") $ do
         getRvAndRVRsRS; publishMetric; enqueueRS; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
         cmdStatusMap; dequeueFromApi;
 
-    cluster (Str "Commit.hsBox") $ do
-        graphAttrs [Label (StrLabel "Commit.hs")]
-        doCommit
-
     cluster (Str "Sender.hsBox") $ do
         graphAttrs [Label (StrLabel "Sender.hs")]
-        sendStar
+        sendAppendEntries; sendAppendEntriesResponse;
 
     cluster (Str "MessageReceiver.hsBox") $ do
         graphAttrs [Label (StrLabel "MessageReceiver.hs")]
@@ -160,6 +157,7 @@ junoServer = digraph (Str "junoServer") $ do
     commandMVarMap;
     runApiServer; apiEnv;
     pubMetric; updateCmdMapFn;
+    doCommit;
     electionTimeoutH; heartbeatTimeoutH;
     appendEntriesH; requestVoteH; requestVoteResponseH; commandH; revolutionH;
 
@@ -209,7 +207,8 @@ junoServer = digraph (Str "junoServer") $ do
     "doCommit" --> "applyLogEntry"
 
     -- Juno.Runtime.Sender
-    "sendStar" --> "sendMessage"
+    "sendAppendEntries" --> "sendMessage"
+    "sendAppendEntriesResponse" --> "sendMessage"
 
     -- Juno.Runtime.MessageReceiver
     "getMessages" --> "messageReceiver"
@@ -223,21 +222,27 @@ junoServer = digraph (Str "junoServer") $ do
     "handleEvents" --> "handleRPC"
     edge "handleEvents" "issueBatch" [textLabel "if Leader"] -- condition is really inside `issueBatch`
     "issueBatch" --> "doCommit"
-    edge "issueBatch" "sendStar" [textLabel "sendAllAppendEntries/Response"]
+    "issueBatch" --> "sendAppendEntries"
+    "issueBatch" --> "sendAppendEntriesResponse"
     -- Juno.Consensus.Handle.AppendEntriesResponse
     "handleEvents" --> "handleAlotOfAers"
+    "handleAlotOfAers" --> "appendEntriesResponseH"
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
     -- Juno.Consensus.Handle.HeartbeatTimeout
     "handleEvents" --> "heartbeatTimeoutH"
+
     -- NEXT: handleEvents / * fanout
-    -- NEXT: handleRPC fanout
+    
     "handleRPC" --> "appendEntriesH"
     "handleRPC" --> "appendEntriesResponseH"
     "handleRPC" --> "requestVoteH"
     "handleRPC" --> "requestVoteResponseH"
     "handleRPC" --> "commandH"
     "handleRPC" --> "revolutionH"
+
+    -- NEXT: handleRPC fanout
+    "appendEntriesH" --> "sendAppendEntriesResponse"
 
 main :: IO ()
 main =
