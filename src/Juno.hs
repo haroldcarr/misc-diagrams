@@ -36,10 +36,8 @@ function       = uRectangle []
 dataStructure :: n -> Text -> Dot n
 dataStructure  = uCircle'
 
-
 ------------------------------------------------------------------------------
 -- SERVER
-
 
 mk "dataStructure"
    [ -- Apps.Juno.Server main
@@ -124,6 +122,10 @@ mk "function"
    , ("requestVoteResponseH", "requestVoteResponseH")
    , ("commandH", "commandH")
    , ("revolutionH", "revolutionH")
+
+     -- Juno.Runtime.Timer
+   , ("electionTimer", "electionTimer")
+   , ("heartbeatTimer", "heartbeatTimer")
    ]
 
 junoServer :: G.DotGraph L.Text
@@ -157,6 +159,10 @@ junoServer = digraph (Str "junoServer") $ do
     cluster (Str "H.AppendEntriesResponse.hsBox") $ do
         graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
         handleAlotOfAers; appendEntriesResponseH; updateCommitProofMap;
+
+    cluster (Str "Runtime.Timer.hsBox") $ do
+        graphAttrs [Label (StrLabel "Timer.hs")]
+        electionTimer; heartbeatTimer;
 
     graphAttrs [RankDir FromLeft]
     applyFn;
@@ -236,6 +242,7 @@ junoServer = digraph (Str "junoServer") $ do
     "handleAlotOfAers" --> "appendEntriesResponseH"
     "appendEntriesResponseH" --> "updateCommitProofMap"
     "appendEntriesResponseH" --> "doCommit"
+    "appendEntriesResponseH" --> "electionTimer"
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
     -- Juno.Consensus.Handle.HeartbeatTimeout
