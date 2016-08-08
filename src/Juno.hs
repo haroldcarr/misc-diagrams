@@ -38,8 +38,7 @@ rectangle     = uRectangle []
 
 mk "rectangle"
    [ -- Apps.Juno.Server main
-     ("toCommands","toCommands")
-   , ("fromCommands","fromCommands")
+     ("toFromCommands","toFromCommands")
    , ("commandMVarMap","CommandMVarMap")
    , ("applyFn","applyFn")
 
@@ -48,18 +47,12 @@ mk "rectangle"
    , ("runCommand", "runCommand")
 
      -- Juno.Spec.Simple runJuno
-   , ("inboxWrite","inboxWrite")
-   , ("inboxRead","inboxRead")
-   , ("cmdInboxWrite", "cmdInboxWrite")
-   , ("cmdInboxRead", "cmdInboxRead")
-   , ("aerInboxWrite", "aerInboxWrite")
-   , ("aerInboxRead", "aerInboxRead")
-   , ("rvAndRvrWrite","rvAndRvrWrite")
-   , ("rvAndRvrRead", "rvAndRvrRead")
-   , ("outboxWrite","outboxWrite")
-   , ("outboxRead","outboxRead")
-   , ("eventWrite","eventWrite")
-   , ("eventRead","eventRead")
+   , ("inboxWR","inboxWR")
+   , ("cmdInboxWR", "cmdInboxWR")
+   , ("aerInboxWR", "aerInboxWR")
+   , ("rvAndRvrWR","rvAndRvrWR")
+   , ("outboxWR","outboxWR")
+   , ("eventWR","eventWR")
    , ("pubMetric", "pubMetric")
 
      -- Juno.Runtime.Api.ApiServer
@@ -109,6 +102,12 @@ mk "rectangle"
    , ("handleEvents", "handleEvents")
    , ("handleRPC", "handleRPC")
    , ("issueBatch", "issueBatch")
+   -- Juno.Consensus.Handle.AppendEntriesResponse
+   , ("handleAlotOfAers", "handleAlotOfAers")
+   -- Juno.Consensus.Handle.ElectionTimeout
+   , ("electionTimeoutHandle", "electionTimeoutH")
+   -- Juno.Consensus.Handle.HeartbeatTimeout
+   , ("heartbeatTimeoutHandle", "heartbeatTimeoutH")
    ]
 
 junoServer :: G.DotGraph L.Text
@@ -143,70 +142,64 @@ junoServer = digraph (Str "junoServer") $ do
         graphAttrs [Label (StrLabel "Handle.hs")]
         handleEvents; handleRPC; issueBatch
 
+    cluster (Str "H.AppendEntriesResponse.hsBox") $ do
+        graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
+        handleAlotOfAers
+
     graphAttrs [RankDir FromLeft]
-    applyFn
-    inboxRead; inboxWrite;
-    outboxRead; outboxWrite;
-    rvAndRvrRead; rvAndRvrWrite;
-    cmdInboxRead; cmdInboxWrite;
-    aerInboxRead; aerInboxWrite;
-    inboxRead; outboxWrite;
+    applyFn;
+    inboxWR; outboxWR; rvAndRvrWR; cmdInboxWR; aerInboxWR;
     zmqSocketPull; zmqSocketPush;
-    fromCommands; toCommands;
-    eventRead; eventWrite;
+    toFromCommands;
+    eventWR;
     runCommand; applyFn;
     commandMVarMap;
     runApiServer; apiEnv;
     pubMetric; updateCmdMapFn;
+    electionTimeoutHandle
+    heartbeatTimeoutHandle
 
     -- Apps.Juno.Server main
-    "toCommands" --> "fromCommands"
     "runCommand" --> "junoEnv"
     "applyFn" --> "runCommand"
 
     -- Juno.Spec.Simple runJuno
-    "inboxWrite" --> "inboxRead"
-    "cmdInboxWrite" --> "cmdInboxRead"
-    "aerInboxWrite" --> "aerInboxRead"
-    "rvAndRvrWrite" --> "rvAndRvrRead"
-    "outboxWrite" --> "outboxRead"
-    "eventWrite" --> "eventRead"
 
     -- Juno.Runtime.Api.ApiServer
     "commandMVarMap" --> "runApiServer"
-    "runApiServer"   --> "toCommands"
+    "runApiServer"   --> "toFromCommands"
     "apiEnv" --> "runApiServer"
 
     -- Juno.Messaging.ZMQ runMsgServer
-    edge "zmqSocketPull"    "rvAndRvrWrite" [textLabel "RV | RVR"]
-    edge "zmqSocketPull"    "cmdInboxWrite" [textLabel "CMD | CMDB"]
-    edge "zmqSocketPull"    "aerInboxWrite" [textLabel "AER"]
-    edge "zmqSocketPull"    "inboxWrite"    [textLabel "otherwise"]
+    edge "zmqSocketPull"    "rvAndRvrWR" [textLabel "RV | RVR"]
+    edge "zmqSocketPull"    "cmdInboxWR" [textLabel "CMD | CMDB"]
+    edge "zmqSocketPull"    "aerInboxWR" [textLabel "AER"]
+    edge "zmqSocketPull"    "inboxWR"    [textLabel "otherwise"]
 
-    edge "outboxRead"       "zmqSocketPush" [textLabel "send rolodex"]
+    edge "outboxWR"       "zmqSocketPush" [textLabel "send rolodex"]
 
     -- ReceiverEnv : Juno.Runtime.MessageReceiver
-    "inboxRead" --> "getMessages"
-    "cmdInboxRead" --> "getNewCommands"
-    "aerInboxRead" --> "getNewEvidence"
-    "rvAndRvrRead" --> "getRvAndRVRs"
-    "enqueue" --> "eventWrite"
+    "inboxWR" --> "getMessages"
+    "cmdInboxWR" --> "getNewCommands"
+    "aerInboxWR" --> "getNewEvidence"
+    "rvAndRvrWR" --> "getRvAndRVRs"
+    "enqueue" --> "eventWR"
 
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
     "applyLogEntry" --> "applyFn"
-    "sendMessage" --> "outboxWrite"
-    "inboxRead" --> "getMessageRS"
-    "cmdInboxRead" --> "getNewCommandsRS"
-    "aerInboxRead" --> "getNewEvidenceRS"
-    "rvAndRvrRead" --> "getRvAndRVRsRS"
+    "sendMessage" --> "outboxWR"
+    "inboxWR" --> "getMessageRS"
+    "cmdInboxWR" --> "getNewCommandsRS"
+    "aerInboxWR" --> "getNewEvidenceRS"
+    "rvAndRvrWR" --> "getRvAndRVRsRS"
     "publishMetric" --> "pubMetric"
-    "enqueueRS" --> "eventWrite"
-    "enqueueMultiple" --> "eventWrite"
-    "enqueueLater" --> "eventWrite"
-    "eventRead" --> "dequeue"
+    "enqueueRS" --> "eventWR"
+    "enqueueMultiple" --> "eventWR"
+    "enqueueLater" --> "eventWR"
+    "eventWR" --> "dequeue"
     "updateCmdMapFn" --> "updateCmdMap"
     "commandMVarMap" --> "cmdStatusMap"
-    "fromCommands" --> "dequeueFromApi"
+    "toFromCommands" --> "dequeueFromApi"
 
     -- Juno.Consensus.Commit
     "doCommit" --> "applyLogEntry"
@@ -227,7 +220,14 @@ junoServer = digraph (Str "junoServer") $ do
     edge "handleEvents" "issueBatch" [textLabel "if Leader"] -- condition is really inside `issueBatch`
     "issueBatch" --> "doCommit"
     edge "issueBatch" "sendStar" [textLabel "sendAllAppendEntries/Response"]
-    -- NEXT: handleEvents and handleRPC fanout
+    -- Juno.Consensus.Handle.AppendEntriesResponse
+    "handleEvents" --> "handleAlotOfAers"
+    -- Juno.Consensus.Handle.ElectionTimeout
+    "handleEvents" --> "electionTimeoutHandle"
+    -- Juno.Consensus.Handle.HeartbeatTimeout
+    "handleEvents" --> "heartbeatTimeoutHandle"
+    -- NEXT: handleEvents / * fanout
+    -- NEXT: handleRPC fanout
 
 main :: IO ()
 main =
