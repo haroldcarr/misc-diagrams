@@ -17,7 +17,7 @@ import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Fixed
                                                          Number (Int),
                                                          RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots, uRectangle)
+import           Data.GraphViz.HC.Util                  (doDots, uCircle', uRectangle)
 import           Data.GraphViz.HC.DiagramsTH            (mk)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
@@ -36,16 +36,12 @@ rectangle     = uRectangle []
 ------------------------------------------------------------------------------
 -- SERVER
 
-mk "rectangle"
+mk "uCircle'"
    [ -- Apps.Juno.Server main
-     ("toFromCommands","toFromCommands")
-   , ("commandMVarMap","CommandMVarMap")
-   , ("applyFn","applyFn")
+     ("commandMVarMap","CommandMVarMap")
 
      -- App.Juno.Command
    , ("junoEnv", "JunoEnv")
-   , ("runCommand", "runCommand")
-
      -- Juno.Spec.Simple runJuno
    , ("inboxWR","inboxWR")
    , ("cmdInboxWR", "cmdInboxWR")
@@ -53,6 +49,19 @@ mk "rectangle"
    , ("rvAndRvrWR","rvAndRvrWR")
    , ("outboxWR","outboxWR")
    , ("eventWR","eventWR")
+     -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
+   , ("cmdStatusMap", "cmdStatusMap")
+   ]
+
+mk "rectangle"
+   [ -- Apps.Juno.Server main
+     ("toFromCommands","toFromCommands")
+   , ("applyFn","applyFn")
+
+     -- App.Juno.Command
+   , ("runCommand", "runCommand")
+
+     -- Juno.Spec.Simple runJuno
    , ("pubMetric", "pubMetric")
 
      -- Juno.Runtime.Api.ApiServer
@@ -86,7 +95,6 @@ mk "rectangle"
    , ("enqueueLater", "enqueueLater")
    , ("dequeue", "dequeue")
    , ("updateCmdMap", "updateCmdMap")
-   , ("cmdStatusMap", "cmdStatusMap")
    , ("dequeueFromApi", "dequeueFromApi")
 
      -- Juno.Consensus.Commit
