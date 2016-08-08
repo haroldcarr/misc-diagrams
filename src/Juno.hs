@@ -30,13 +30,18 @@ import           Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
 default (T.Text)
 
-rectangle    :: n -> Text -> Dot n
-rectangle     = uRectangle []
+function      :: n -> Text -> Dot n
+function       = uRectangle []
+
+dataStructure :: n -> Text -> Dot n
+dataStructure  = uCircle'
+
 
 ------------------------------------------------------------------------------
 -- SERVER
 
-mk "uCircle'"
+
+mk "dataStructure"
    [ -- Apps.Juno.Server main
      ("commandMVarMap","CommandMVarMap")
 
@@ -53,7 +58,7 @@ mk "uCircle'"
    , ("cmdStatusMap", "cmdStatusMap")
    ]
 
-mk "rectangle"
+mk "function"
    [ -- Apps.Juno.Server main
      ("toFromCommands","toFromCommands")
    , ("applyFn","applyFn")
@@ -101,6 +106,7 @@ mk "rectangle"
    , ("doCommit", "doCommit")
 
      -- Juno.Runtime.Sender
+   , ("sendDummyCollector", "*")
    , ("sendAppendEntries", "send(All)AppendEntries")
    , ("sendAppendEntriesResponse", "send(All)AppendEntriesResponse")
 
@@ -113,10 +119,12 @@ mk "rectangle"
    , ("issueBatch", "issueBatch")
    -- Juno.Consensus.Handle.AppendEntriesResponse ...
    , ("handleAlotOfAers", "handleAlotOfAers")
+   , ("appendEntriesResponseH", "handle")
+   , ("updateCommitProofMap", "updateCommitProofMap")
+
    , ("electionTimeoutH", "electionTimeoutH")
    , ("heartbeatTimeoutH", "heartbeatTimeoutH")
    , ("appendEntriesH", "appendEntriesH")
-   , ("appendEntriesResponseH", "handle")
    , ("requestVoteH", "requestVoteH")
    , ("requestVoteResponseH", "requestVoteResponseH")
    , ("commandH", "commandH")
@@ -141,7 +149,7 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "Sender.hsBox") $ do
         graphAttrs [Label (StrLabel "Sender.hs")]
-        sendAppendEntries; sendAppendEntriesResponse;
+        sendDummyCollector; sendAppendEntries; sendAppendEntriesResponse;
 
     cluster (Str "MessageReceiver.hsBox") $ do
         graphAttrs [Label (StrLabel "MessageReceiver.hs")]
@@ -153,7 +161,7 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "H.AppendEntriesResponse.hsBox") $ do
         graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
-        handleAlotOfAers; appendEntriesResponseH
+        handleAlotOfAers; appendEntriesResponseH; updateCommitProofMap;
 
     graphAttrs [RankDir FromLeft]
     applyFn;
@@ -215,8 +223,9 @@ junoServer = digraph (Str "junoServer") $ do
     "doCommit" --> "applyLogEntry"
 
     -- Juno.Runtime.Sender
-    "sendAppendEntries" --> "sendMessage"
-    "sendAppendEntriesResponse" --> "sendMessage"
+    "sendAppendEntries" --> "sendDummyCollector"
+    "sendAppendEntriesResponse" --> "sendDummyCollector"
+    "sendDummyCollector" --> "sendMessage"
 
     -- Juno.Runtime.MessageReceiver
     "getMessages" --> "messageReceiver"
@@ -235,13 +244,15 @@ junoServer = digraph (Str "junoServer") $ do
     -- Juno.Consensus.Handle.AppendEntriesResponse
     "handleEvents" --> "handleAlotOfAers"
     "handleAlotOfAers" --> "appendEntriesResponseH"
+    "appendEntriesResponseH" --> "updateCommitProofMap"
+    "appendEntriesResponseH" --> "doCommit"
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
     -- Juno.Consensus.Handle.HeartbeatTimeout
     "handleEvents" --> "heartbeatTimeoutH"
 
     -- NEXT: handleEvents / * fanout
-    
+
     "handleRPC" --> "appendEntriesH"
     "handleRPC" --> "appendEntriesResponseH"
     "handleRPC" --> "requestVoteH"
