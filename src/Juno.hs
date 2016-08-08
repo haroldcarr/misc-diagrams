@@ -43,7 +43,8 @@ dataStructure  = uCircle'
 
 mk "dataStructure"
    [ -- Apps.Juno.Server main
-     ("commandMVarMap","CommandMVarMap")
+     ("toFromCommands","toFrom\nCommands")
+   , ("commandMVarMap","CommandMVarMap")
 
      -- App.Juno.Command
    , ("junoEnv", "JunoEnv")
@@ -60,8 +61,7 @@ mk "dataStructure"
 
 mk "function"
    [ -- Apps.Juno.Server main
-     ("toFromCommands","toFromCommands")
-   , ("applyFn","applyFn")
+     ("applyFn","applyFn")
 
      -- App.Juno.Command
    , ("runCommand", "runCommand")
@@ -90,12 +90,7 @@ mk "function"
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
    , ("applyLogEntry", "applyLogEntry")
    , ("sendMessage", "sendMessage(s)")
-   , ("getMessageRS", "getMessage(s)")
-   , ("getNewCommandsRS", "getNewCommands")
-   , ("getNewEvidenceRS", "getNewEvidence")
-   , ("getRvAndRVRsRS", "getRvAndRVRs")
    , ("publishMetric", "publishMetric")
-   , ("enqueueRS", "enqueue")
    , ("enqueueMultiple", "enqueueMultiple")
    , ("enqueueLater", "enqueueLater")
    , ("dequeue", "dequeue")
@@ -143,8 +138,8 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "RaftSpecBox") $ do
         graphAttrs [Label (StrLabel "RaftSpec")]
-        applyLogEntry; sendMessage; getMessageRS; getNewCommandsRS; getNewEvidenceRS;
-        getRvAndRVRsRS; publishMetric; enqueueRS; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
+        applyLogEntry; sendMessage;
+        publishMetric; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
         cmdStatusMap; dequeueFromApi;
 
     cluster (Str "Sender.hsBox") $ do
@@ -206,12 +201,7 @@ junoServer = digraph (Str "junoServer") $ do
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
     "applyLogEntry" --> "applyFn"
     "sendMessage" --> "outboxWR"
-    "inboxWR" --> "getMessageRS"
-    "cmdInboxWR" --> "getNewCommandsRS"
-    "aerInboxWR" --> "getNewEvidenceRS"
-    "rvAndRvrWR" --> "getRvAndRVRsRS"
     "publishMetric" --> "pubMetric"
-    "enqueueRS" --> "eventWR"
     "enqueueMultiple" --> "eventWR"
     "enqueueLater" --> "eventWR"
     "eventWR" --> "dequeue"
