@@ -102,12 +102,16 @@ mk "rectangle"
    , ("handleEvents", "handleEvents")
    , ("handleRPC", "handleRPC")
    , ("issueBatch", "issueBatch")
-   -- Juno.Consensus.Handle.AppendEntriesResponse
+   -- Juno.Consensus.Handle.AppendEntriesResponse ...
    , ("handleAlotOfAers", "handleAlotOfAers")
-   -- Juno.Consensus.Handle.ElectionTimeout
-   , ("electionTimeoutHandle", "electionTimeoutH")
-   -- Juno.Consensus.Handle.HeartbeatTimeout
-   , ("heartbeatTimeoutHandle", "heartbeatTimeoutH")
+   , ("electionTimeoutH", "electionTimeoutH")
+   , ("heartbeatTimeoutH", "heartbeatTimeoutH")
+   , ("appendEntriesH", "appendEntriesH")
+   , ("appendEntriesResponseH", "handle")
+   , ("requestVoteH", "requestVoteH")
+   , ("requestVoteResponseH", "requestVoteResponseH")
+   , ("commandH", "commandH")
+   , ("revolutionH", "revolutionH")
    ]
 
 junoServer :: G.DotGraph L.Text
@@ -144,7 +148,7 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "H.AppendEntriesResponse.hsBox") $ do
         graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
-        handleAlotOfAers
+        handleAlotOfAers; appendEntriesResponseH
 
     graphAttrs [RankDir FromLeft]
     applyFn;
@@ -156,8 +160,8 @@ junoServer = digraph (Str "junoServer") $ do
     commandMVarMap;
     runApiServer; apiEnv;
     pubMetric; updateCmdMapFn;
-    electionTimeoutHandle
-    heartbeatTimeoutHandle
+    electionTimeoutH; heartbeatTimeoutH;
+    appendEntriesH; requestVoteH; requestVoteResponseH; commandH; revolutionH;
 
     -- Apps.Juno.Server main
     "runCommand" --> "junoEnv"
@@ -223,11 +227,17 @@ junoServer = digraph (Str "junoServer") $ do
     -- Juno.Consensus.Handle.AppendEntriesResponse
     "handleEvents" --> "handleAlotOfAers"
     -- Juno.Consensus.Handle.ElectionTimeout
-    "handleEvents" --> "electionTimeoutHandle"
+    "handleEvents" --> "electionTimeoutH"
     -- Juno.Consensus.Handle.HeartbeatTimeout
-    "handleEvents" --> "heartbeatTimeoutHandle"
+    "handleEvents" --> "heartbeatTimeoutH"
     -- NEXT: handleEvents / * fanout
     -- NEXT: handleRPC fanout
+    "handleRPC" --> "appendEntriesH"
+    "handleRPC" --> "appendEntriesResponseH"
+    "handleRPC" --> "requestVoteH"
+    "handleRPC" --> "requestVoteResponseH"
+    "handleRPC" --> "commandH"
+    "handleRPC" --> "revolutionH"
 
 main :: IO ()
 main =
