@@ -42,7 +42,7 @@ dataStructure  = uCircle'
 mk "dataStructure"
    [ -- Apps.Juno.Server main
      ("toFromCommands","toFrom\nCommands")
-   , ("commandMVarMap","CommandMVarMap")
+   , ("commandMVarMap","Command\nMVarMap")
 
      -- App.Juno.Command
    , ("junoEnv", "JunoEnv")
@@ -54,7 +54,7 @@ mk "dataStructure"
    , ("outboxWR","outboxWR")
    , ("eventWR","eventWR")
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
-   , ("cmdStatusMap", "cmdStatusMap")
+   , ("cmdStatusMap", "cmd\nStatusMap")
    ]
 
 mk "function"
@@ -100,6 +100,7 @@ mk "function"
 
      -- Juno.Runtime.Sender
    , ("sendDummyCollector", "*")
+   , ("sendRPC", "sendRPC")
    , ("sendAppendEntries", "send(All)AppendEntries")
    , ("sendAppendEntriesResponse", "send(All)AppendEntriesResponse")
 
@@ -146,11 +147,7 @@ junoServer = digraph (Str "junoServer") $ do
 
     cluster (Str "Sender.hsBox") $ do
         graphAttrs [Label (StrLabel "Sender.hs")]
-        sendDummyCollector; sendAppendEntries; sendAppendEntriesResponse;
-
-    cluster (Str "MessageReceiver.hsBox") $ do
-        graphAttrs [Label (StrLabel "MessageReceiver.hs")]
-        messageReceiver
+        sendDummyCollector; sendRPC; sendAppendEntries; sendAppendEntriesResponse;
 
     cluster (Str "Handle.hsBox") $ do
         graphAttrs [Label (StrLabel "Handle.hs")]
@@ -173,6 +170,7 @@ junoServer = digraph (Str "junoServer") $ do
     runCommand; applyFn;
     commandMVarMap;
     runApiServer; apiEnv;
+    messageReceiver
     pubMetric; updateCmdMapFn;
     doCommit;
     electionTimeoutH; heartbeatTimeoutH;
@@ -219,6 +217,7 @@ junoServer = digraph (Str "junoServer") $ do
     "doCommit" --> "applyLogEntry"
 
     -- Juno.Runtime.Sender
+    "sendRPC"  --> "sendDummyCollector"
     "sendAppendEntries" --> "sendDummyCollector"
     "sendAppendEntriesResponse" --> "sendDummyCollector"
     "sendDummyCollector" --> "sendMessage"
@@ -245,10 +244,14 @@ junoServer = digraph (Str "junoServer") $ do
     "appendEntriesResponseH" --> "electionTimer"
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
+    edge "electionTimeoutH" "sendRPC" [textLabel "castLazyVote |\nsendRequestVote"]
+    "electionTimeoutH" --> "electionTimer"
+
     -- Juno.Consensus.Handle.HeartbeatTimeout
     "handleEvents" --> "heartbeatTimeoutH"
-
-    -- NEXT: handleEvents / * fanout
+    edge "heartbeatTimeoutH" "sendAppendEntries" [textLabel "IsLeader"]
+    edge "heartbeatTimeoutH" "heartbeatTimer" [textLabel "IsLeader"]
+    edge "heartbeatTimeoutH" "enqueue" [textLabel "NoFollers : ElectionTimeout"]
 
     "handleRPC" --> "appendEntriesH"
     "handleRPC" --> "appendEntriesResponseH"
@@ -257,8 +260,13 @@ junoServer = digraph (Str "junoServer") $ do
     "handleRPC" --> "commandH"
     "handleRPC" --> "revolutionH"
 
-    -- NEXT: handleRPC fanout
     "appendEntriesH" --> "sendAppendEntriesResponse"
+    edge "requestVoteH" "sendRPC" [textLabel "RVR'"]
+    "requestVoteResponseH" --> "sendAppendEntries"
+    "requestVoteResponseH" --> "electionTimer"
+    "requestVoteResponseH" --> "heartbeatTimer"
+    edge "commandH" "sendRPC" [textLabel "RetransmitToLeader |\nSendCommandResponse"]
+    edge "commandH" "updateCommitProofMap" [textLabel "CommitAndPropagate"] -- TODO: what propagate?
 
 main :: IO ()
 main =
