@@ -61,8 +61,11 @@ mk "dataStructure"
    ]
 
 mk "function"
-   [ -- Apps.Juno.Server main
-     ("applyFn","applyFn")
+   [ -- Client
+     ("client","client")
+
+     -- Apps.Juno.Server main
+   , ("applyFn","applyFn")
 
      -- App.Juno.Command
    , ("runCommand", "runCommand")
@@ -108,15 +111,23 @@ mk "function"
    , ("sendRPC", "sendRPC")
    , ("sendResults", "sendResults")
    , ("sendAppendEntries", "send(All)\nAppendEntries")
+   , ("sendAppendEntriesF", "send(All)\nAppendEntries")
    , ("sendAppendEntriesResponse", "send(All)\nAppendEntriesResponse")
+   , ("sendAppendEntriesResponseF", "send(All)\nAppendEntriesResponse")
 
      -- Juno.Runtime.MessageReceiver
    , ("messageReceiver", "messageReceiver")
 
      -- Juno.Consensus.Handle
    , ("handleEvents", "handleEvents")
+   , ("handleEventsF", "handleEvents")
    , ("handleRPC", "handleRPC")
    , ("issueBatch", "issueBatch")
+   , ("issueBatchF", "issueBatch")
+     -- Juno.Consensus.Handle.AppendEntries
+   , ("handleAppendEntries", "handleAppendEntries")
+   , ("appendLogEntries", "appendLogEntries")
+   , ("addLogEntriesAt", "addLogEntriesAt")
      -- Juno.Consensus.Handle.AppendEntriesResponse ...
    , ("handleAlotOfAers", "handleAlotOfAers")
    , ("appendEntriesResponseH", "handle")

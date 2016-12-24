@@ -41,15 +41,19 @@ junoCmdCommit :: G.DotGraph L.Text
 junoCmdCommit = digraph (Str "junoCmdCommit") $ do
 
     graphAttrs [ {- RankDir FromLeft, -} Compound True]
+
+    client;
+
+    "client" --> "handleEvents"
+
     cluster (Str "leaderId") $ do
         graphAttrs [Label (StrLabel "leader")]
-        handleEvents; handleRPC; handleCommand;
+        handleEvents; handleCommand;
         issueBatch; doCommit; applyLogEntries; applyCommand; apply;
         appendLogEntry; sendResults; sendAppendEntries; sendAppendEntriesResponse;
         updateCommitIndex; checkCommitProof;
 
-    edge "handleEvents"         "handleRPC" [textLabel "1"]
-    "handleRPC" -->             "handleCommand"
+    edge "handleEvents"         "handleCommand" [textLabel "1"]
     "handleCommand" -->         "appendLogEntry"
 
     edge "handleEvents"         "issueBatch" [textLabel "2"]
@@ -60,9 +64,23 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
     edge "applyLogEntries"      "applyCommand" [textLabel "1"]
     edge "applyCommand"         "apply"  [textLabel "app-specific"]
     edge "applyLogEntries"      "sendResults" [textLabel "2 to clients"]
+    "sendResults" -->           "client"
 
     edge "issueBatch"           "sendAppendEntriesResponse" [textLabel "2"]
     edge "issueBatch"           "sendAppendEntries" [textLabel "3"]
+    "sendAppendEntries" -->     "handleEventsF"
+
+    cluster (Str "followerId") $ do
+        graphAttrs [Label (StrLabel "follower")]
+        handleEventsF; issueBatchF; handleAppendEntries; appendLogEntries; addLogEntriesAt;
+        sendAppendEntriesResponseF;
+
+    edge "handleEventsF"        "handleAppendEntries" [textLabel "1"]
+    edge "handleAppendEntries"  "appendLogEntries"    [textLabel "1"]
+    "appendLogEntries" -->      "addLogEntriesAt"
+    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "2"]
+
+    edge "handleEventsF"        "issueBatchF"  [textLabel "2"]
 
 ------------------------------------------------------------------------------
 
