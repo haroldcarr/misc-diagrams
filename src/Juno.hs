@@ -1,133 +1,41 @@
-{-# LANGUAGE ExtendedDefaultRules       #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE TemplateHaskell      #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
 module Main where
 
-import           Data.GraphViz                          (filled, shape, style,
-                                                         textLabel, GraphvizCommand(TwoPi))
+import           JunoCommon
+
+import           Data.GraphViz                          (GraphvizCommand (TwoPi),
+                                                         filled, shape, style,
+                                                         textLabel)
 import           Data.GraphViz.Attributes.Colors.Brewer (BrewerColor (BC),
                                                          BrewerName (Pastel2),
                                                          BrewerScheme (BScheme))
 import           Data.GraphViz.Attributes.Complete      (Attribute (Color, FixedSize, Height, Label, RankDir, Width),
-                                                         Color (RGB), ColorList (..),
+                                                         Color (RGB),
+                                                         ColorList (..),
                                                          Label (StrLabel),
                                                          NodeSize (SetNodeSize),
                                                          Number (Int),
-                                                         RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
+                                                         RankDir (FromLeft),
+                                                         Shape (BoxShape, Circle, DiamondShape, DoubleCircle),
                                                          toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots, uCircle', uRectangle)
 import           Data.GraphViz.HC.DiagramsTH            (mk)
+import           Data.GraphViz.HC.Util                  (doDots, uCircle',
+                                                         uRectangle)
 import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
 import           Data.GraphViz.Types.Monadic            (Dot,
-                                                         GraphID (Str, Num),
+                                                         GraphID (Num, Str),
                                                          cluster, digraph, edge,
                                                          graphAttrs, node,
                                                          (-->))
-import qualified Data.Text                              as T (Text)
-import           Data.Text.Lazy                         as L (Text)
+import qualified Data.Text.Lazy                         as L (Text)
 import           Data.Word                              (Word8)
-default (T.Text)
-
-function      :: n -> Text -> Dot n
-function       = uRectangle []
-
-dataStructure :: n -> Text -> Dot n
-dataStructure  = uCircle'
+default (L.Text)
 
 ------------------------------------------------------------------------------
--- SERVER
-
-mk "dataStructure"
-   [ -- Apps.Juno.Server main
-     ("toFromCommands","toFrom\nCommands")
-   , ("commandMVarMap","Command\nMVarMap")
-
-     -- App.Juno.Command
-   , ("junoEnv", "JunoEnv")
-     -- Juno.Spec.Simple runJuno
-   , ("inboxWR","inboxWR")
-   , ("cmdInboxWR", "cmdInboxWR")
-   , ("aerInboxWR", "aerInboxWR")
-   , ("rvAndRvrWR","rvAndRvrWR")
-   , ("outboxWR","outboxWR")
-   , ("eventWR","eventWR")
-     -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
-   , ("cmdStatusMap", "cmd\nStatusMap")
-   ]
-
-mk "function"
-   [ -- Apps.Juno.Server main
-     ("applyFn","applyFn")
-
-     -- App.Juno.Command
-   , ("runCommand", "runCommand")
-
-     -- Juno.Spec.Simple runJuno
-   , ("pubMetric", "pubMetric")
-
-     -- Juno.Runtime.Api.ApiServer
-   , ("runApiServer","runApiServer")
-   , ("apiEnv", "ApiEnv")
-
-     -- Juno.Messaging.ZMQ runMsgServer
-   , ("zmqSocketPull","zmqSocketPull")
-   , ("zmqSocketPush","zmqSocketPush")
-
-     -- ?
-   , ("updateCmdMapFn", "updateCmdMapFn")
-
-     -- ReceiverEnv : Juno.Runtime.MessageReceiver
-   , ("getMessages", "getMessages")
-   , ("getNewCommands", "getNewCommands")
-   , ("getNewEvidence", "getNewEvidence")
-   , ("getRvAndRVRs", "getRvAndRVRs")
-   , ("enqueue", "enqueue")
-
-     -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
-   , ("applyLogEntry", "applyLogEntry")
-   , ("sendMessage", "sendMessage(s)")
-   , ("publishMetric", "publishMetric")
-   , ("enqueueMultiple", "enqueueMultiple")
-   , ("enqueueLater", "enqueueLater")
-   , ("dequeue", "dequeue")
-   , ("updateCmdMap", "updateCmdMap")
-   , ("dequeueFromApi", "dequeueFromApi")
-
-     -- Juno.Consensus.Commit
-   , ("doCommit", "doCommit")
-
-     -- Juno.Runtime.Sender
-   , ("sendDummyCollector", "*")
-   , ("sendRPC", "sendRPC")
-   , ("sendAppendEntries", "send(All)AppendEntries")
-   , ("sendAppendEntriesResponse", "send(All)AppendEntriesResponse")
-
-     -- Juno.Runtime.MessageReceiver
-   , ("messageReceiver", "messageReceiver")
-
-     -- Juno.Consensus.Handle
-   , ("handleEvents", "handleEvents")
-   , ("handleRPC", "handleRPC")
-   , ("issueBatch", "issueBatch")
-   -- Juno.Consensus.Handle.AppendEntriesResponse ...
-   , ("handleAlotOfAers", "handleAlotOfAers")
-   , ("appendEntriesResponseH", "handle")
-   , ("updateCommitProofMap", "updateCommitProofMap")
-
-   , ("electionTimeoutH", "electionTimeoutH")
-   , ("heartbeatTimeoutH", "heartbeatTimeoutH")
-   , ("appendEntriesH", "appendEntriesH")
-   , ("requestVoteH", "requestVoteH")
-   , ("requestVoteResponseH", "requestVoteResponseH")
-   , ("commandH", "commandH")
-   , ("revolutionH", "revolutionH")
-
-     -- Juno.Runtime.Timer
-   , ("electionTimer", "electionTimer")
-   , ("heartbeatTimer", "heartbeatTimer")
-   ]
 
 junoServer :: G.DotGraph L.Text
 junoServer = digraph (Str "junoServer") $ do
@@ -268,8 +176,31 @@ junoServer = digraph (Str "junoServer") $ do
     edge "commandH" "sendRPC" [textLabel "RetransmitToLeader |\nSendCommandResponse"]
     edge "commandH" "updateCommitProofMap" [textLabel "CommitAndPropagate"] -- TODO: what propagate?
 
+------------------------------------------------------------------------------
+
+junoCmdCommit :: G.DotGraph L.Text
+junoCmdCommit = digraph (Str "junoCmdCommit") $ do
+    handleEvents; handleRPC; handleSingleCommand; handleCommand;
+    issueBatch; doCommit; applyLogEntries; applyCommand; apply; makeCommandResponse;
+    appendLogEntry;
+
+    edge "handleEvents" "handleRPC" [textLabel "1"]
+    "handleRPC" --> "handleSingleCommand"
+    "handleSingleCommand" --> "handleCommand"
+    edge "handleCommand" "handleSingleCommand" [textLabel "CommitAndPropagate (LogEntry term cmd B.empty)"]
+    "handleCommand" --> "appendLogEntry"
+    edge "handleEvents" "issueBatch" [textLabel "2"]
+    "issueBatch" --> "doCommit"
+    "doCommit" --> "applyLogEntries"
+    edge "applyLogEntries" "applyCommand" [textLabel "1"]
+    edge "applyCommand" "apply"  [textLabel "apply is app-specific"]
+    "applyCommand" --> "makeCommandResponse"
+
+------------------------------------------------------------------------------
+
 main :: IO ()
 main =
     doDots "/tmp"
-            [ ("junoServer", junoServer)
+            [ ("junoServer"   , junoServer)
+            , ("junoCmdCommit", junoCmdCommit)
             ]
