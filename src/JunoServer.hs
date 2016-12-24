@@ -178,29 +178,8 @@ junoServer = digraph (Str "junoServer") $ do
 
 ------------------------------------------------------------------------------
 
-junoCmdCommit :: G.DotGraph L.Text
-junoCmdCommit = digraph (Str "junoCmdCommit") $ do
-    handleEvents; handleRPC; handleSingleCommand; handleCommand;
-    issueBatch; doCommit; applyLogEntries; applyCommand; apply; makeCommandResponse;
-    appendLogEntry;
-
-    edge "handleEvents" "handleRPC" [textLabel "1"]
-    "handleRPC" --> "handleSingleCommand"
-    "handleSingleCommand" --> "handleCommand"
-    edge "handleCommand" "handleSingleCommand" [textLabel "CommitAndPropagate (LogEntry term cmd B.empty)"]
-    "handleCommand" --> "appendLogEntry"
-    edge "handleEvents" "issueBatch" [textLabel "2"]
-    "issueBatch" --> "doCommit"
-    "doCommit" --> "applyLogEntries"
-    edge "applyLogEntries" "applyCommand" [textLabel "1"]
-    edge "applyCommand" "apply"  [textLabel "apply is app-specific"]
-    "applyCommand" --> "makeCommandResponse"
-
-------------------------------------------------------------------------------
-
 main :: IO ()
 main =
     doDots "/tmp"
             [ ("junoServer"   , junoServer)
-            , ("junoCmdCommit", junoCmdCommit)
             ]
