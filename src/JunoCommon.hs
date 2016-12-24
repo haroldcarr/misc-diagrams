@@ -100,12 +100,15 @@ mk "function"
 
      -- Juno.Consensus.Commit
    , ("doCommit", "doCommit")
+   , ("updateCommitIndex", "updateCommitIndex")
+   , ("checkCommitProof", "checkCommitProof")
 
      -- Juno.Runtime.Sender
    , ("sendDummyCollector", "*")
    , ("sendRPC", "sendRPC")
-   , ("sendAppendEntries", "send(All)AppendEntries")
-   , ("sendAppendEntriesResponse", "send(All)AppendEntriesResponse")
+   , ("sendResults", "sendResults")
+   , ("sendAppendEntries", "send(All)\nAppendEntries")
+   , ("sendAppendEntriesResponse", "send(All)\nAppendEntriesResponse")
 
      -- Juno.Runtime.MessageReceiver
    , ("messageReceiver", "messageReceiver")
