@@ -72,15 +72,14 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
 
     cluster (Str "followerId") $ do
         graphAttrs [Label (StrLabel "follower")]
-        handleEventsF; issueBatchF; handleAppendEntries; appendLogEntries; addLogEntriesAt;
+        handleEventsF; handleAppendEntries; appendLogEntries; addLogEntriesAt;
         sendAppendEntriesResponseF;
 
-    edge "handleEventsF"        "handleAppendEntries" [textLabel "1"]
+    "handleEventsF" -->         "handleAppendEntries"
     edge "handleAppendEntries"  "appendLogEntries"    [textLabel "1"]
     "appendLogEntries" -->      "addLogEntriesAt"
     edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "2"]
-
-    edge "handleEventsF"        "issueBatchF"  [textLabel "2"]
+    "sendAppendEntriesResponseF" --> "handleEvents"
 
 ------------------------------------------------------------------------------
 
