@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 module Main where
@@ -22,6 +23,7 @@ import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
 import           Data.Text.Lazy                    (Text)
 import           Data.Word                         (Word8)
 import           System.Environment                (getArgs)
+import           Text.RawString.QQ
 
 rectangle    :: n -> Text -> Dot n
 rectangle     = uRectangle []
@@ -31,7 +33,26 @@ mk "rectangle"
    -------------------------
    -- domain/registrar
    [ ("many"
-     ,"discreetclothing_com\n discreetheadwear_com\n discreteapparel_com\n discreteapparel_net\n discreteattire_com\n discreteclothes_com\n discreteclothing_net\n discreteclothingco_com\n discreteclothingusa_com\n discreteco_com\n discretefashion_com\n discretehats_net\n discreteheadwear_net\n discreteltd_com\n discreteofficial_com\n discretesport_com\n discretesport_net\n discretethreads_com\n discreteusa_com\n discreteworld_com")
+     ,[r|discreetclothing_com
+        discreetheadwear_com
+        discreteapparel_com
+        discreteapparel_net
+        discreteattire_com
+        discreteclothes_com
+        discreteclothing_net
+        discreteclothingco_com
+        discreteclothingusa_com
+        discreteco_com
+        discretefashion_com
+        discretehats_net
+        discreteheadwear_net
+        discreteltd_com
+        discreteofficial_com
+        discretesport_com
+        discretesport_net
+        discretethreads_com
+        discreteusa_com
+        discreteworld_com|])
    , ("discreteclothing_com"
      ,"discreteclothing.com")
    , ("discreteheadwear_com"
