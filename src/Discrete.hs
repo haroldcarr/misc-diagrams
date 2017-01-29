@@ -33,78 +33,123 @@ mk "rectangle"
    -------------------------
    -- domain/registrar
    [ ("many"
-     ,[r|discreetclothing_com
-        discreetheadwear_com
-        discreteapparel_com
-        discreteapparel_net
-        discreteattire_com
-        discreteclothes_com
-        discreteclothing_net
-        discreteclothingco_com
-        discreteclothingusa_com
-        discreteco_com
-        discretefashion_com
-        discretehats_net
-        discreteheadwear_net
-        discreteltd_com
-        discreteofficial_com
-        discretesport_com
-        discretesport_net
-        discretethreads_com
-        discreteusa_com
-        discreteworld_com|])
+     ,[r|discreetclothing.com
+discreetheadwear.com
+discreteapparel.com
+discreteapparel.net
+discreteattire.com
+discreteclothes.com
+discreteclothing.net
+discreteclothingco.com
+discreteclothingusa.com
+discreteco.com
+discretefashion.com
++discretehats.com/HC
+discretehats.net
+discreteheadwear.net
+discreteltd.com
+discreteofficial.com
+discretesport.net
+discretethreads.com
+discreteusa.com
+discreteworld.com|])
    , ("discreteclothing_com"
-     ,"discreteclothing.com")
+     ,"++discreteclothing.com")
    , ("discreteheadwear_com"
-     ,"discreteheadwear.com")
+     ,"++discreteheadwear.com")
+   , ("discretesport_com"
+     ,"discretesport.com")
    , ("juliancarr_com"
-     ,"juliancarr.com")
+     ,"+juliancarr.com")
    , ("juliancarr_net"
      ,"juliancarr.net")
    , ("peak_series_com"
-     ,"peak-series.com")
+     ,"+peak-series.com")
    , ("pushpeaks_com"
-     ,"pushpeaks.com")
+     ,"+pushpeaks.com")
    , ("rockdiscrete_com"
-     ,"rockdiscrete.com")
+     ,"+rockdiscrete.com")
    -------------------------
    -- nameserver
    , ("discretehats_nfshost_com"
-     ,"* A 208.94.116.204\n*TXT v=spf1 -all\nwww.* CNAME discretehats.nfshost.com.")
+     ,[r|"* A 208.94.116.204
+* TXT v=spf1 -all
+www.* CNAME discretehats.nfshost.com.|])
 
-   , ("ns0102_domaincontrol_com"
-     ,"NS[01|02]_DOMAINCONTROL_COM\nnslookup DISCRETECLOTHING.COM: 23.227.38.32 (shopify)")
+   , ("discreteclothing_com_NFS_NS"
+     ,[r|* A 208.94.116.204
+* www.* CNAME	discretehats.nfshost.com.
+* MX 1 ASPMX.L.GOOGLE.COM.
+* MX 5 ALT1.ASPMX.L.GOOGLE.COM.
+* MX 5 ALT2.ASPMX.L.GOOGLE.COM.
+* MX 10 ASPMX2.GOOGLEMAIL.COM.
+* MX 10 ASPMX3.GOOGLEMAIL.COM.
+* TXT google-site-verification=fEDSdJrQYbdSVuHny01j4NH7ioyxZzMnTxMDSBjxyz0|])
+   , ("discreteclothing_com_GoDadday_NS"
+     ,[r|NS[01|02]_DOMAINCONTROL_COM
+nslookup DISCRETECLOTHING.COM:
+23.227.38.32 (shopify)|])
 
    , ("ns_phx12_nearlyfreespeech_net"
-     ,"ns.phx[1|2].nearlyfreespeech.net.\ndiscreteheadwear.com A 208.94.116.204\ndiscreteheadwear.com MX 0 mx-fwd-1.nearlyfreespeech.net.\nshop.discreteheadwear.com CNAME discreteheadwear-com.myshopify.com.\nwww.discreteheadwear.com A 23.227.38.32")
+     ,[r|ns.phx[1|2].nearlyfreespeech.net.
+discreteheadwear.com A 208.94.116.204
+discreteheadwear.com MX 0 mx-fwd-1.nearlyfreespeech.net.
+shop.discreteheadwear.com CNAME discreteheadwear-com.myshopify.com.
+www.discreteheadwear.com A 23.227.38.32|])
 
+   , ("discretesport_com_NS"
+     ,"discretesport.com NS")
    , ("juliancarr_nfshost_com"
-     ,"juliancarr.com A 208.94.116.204\n*TXT v=spf1 -all\nwww.juliancarr.com CNAME juliancarr.nfshost.com.")
+     ,[r|juliancarr.com A 208.94.116.204
+* TXT v=spf1 -all
+www.juliancarr.com CNAME juliancarr.nfshost.com.|])
+   , ("juliancarr_net_NS"
+     ,"juliancarr.net NS")
 
    , ("peak_series_nfshost_com"
-     ,"peak-series.com A 208.94.118.220\nwww.peak-series.com CNAME peak-series.nfshost.com." )
+     ,[r|peak-series.com A 208.94.118.220
+www.peak-series.com CNAME peak-series.nfshost.com.|])
 
    , ("pushpeaks_NS"
      ,"pushpeaks.com A 208.94.118.220")
 
    , ("rockdiscrete_NS"
      ,"no A nor CNAME record")
-
    -------------------------
    -- site
    , ("site_discretehats"
-     ,"discretehats.nfshost.com\nIP 208.94.116.38\n.htaccess Redirect\n/ http://www.discreteheadwear.com")
+     ,[r|discretehats.nfshost.com
+IP 208.94.116.38
+.htaccess Redirect
+/ http://www.discreteheadwear.com|])
 
    , ("shopify"
-     ,"shopify\n23.227.38.32")
+     ,[r|shopify
+23.227.38.32|])
 
    , ("site_juliancarr"
-     ,"site NFS\ndiscretehats.nfshost.com\nIP 208.94.118.148\n.htaccess Redirect\n/ https://juliancarr.squarespace.com/")
+     ,[r|discretehats.nfshost.com
+IP 208.94.118.148
+.htaccess Redirect
+/ https://juliancarr.squarespace.com/|])
    , ("site_juliancarr_squarespace"
      ,"https://juliancarr.squarespace.com/")
 
    , ("site_peak_series"
-     ,"peak-series.nfshost.com\nIP 208.94.118.220\n.htaccess Redirect / http://rock.discreteclothing.com/peak-series/")
+     ,[r|peak-series.nfshost.com
+IP 208.94.118.220
+.htaccess Redirect
+/ http://rock.discreteclothing.com/peak-series/|])
+   -------------------------
+   -- mail, etc
+   , ("mx_google"
+     ,"MX google")
+   , ("discreteheadwear_com_mail_forwarding"
+     ,"forwarding")
+   , ("discretesport_com_mail_forwarding"
+     ,"forwarding")
+   , ("juliancarr_net_mail_forwarding"
+     ,"forwarding")
    ]
 
 discrete :: G.DotGraph Text
@@ -113,7 +158,7 @@ discrete = digraph (Str "discrete") $ do
     graphAttrs [RankDir FromLeft, Compound True]
     cluster (Str "registarNFSCluster") $ do
         graphAttrs [Label (StrLabel "registrar NFS")]
-        many; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
+        many; discretesport_com; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
 
     cluster (Str "registrarGoDaddyCluster") $ do
         graphAttrs [Label (StrLabel "registrar GoDaddy")]
@@ -121,28 +166,43 @@ discrete = digraph (Str "discrete") $ do
 
     cluster (Str "nameserverNFSCluster") $ do
         graphAttrs [Label (StrLabel "nameserver NFS")]
-        discretehats_nfshost_com; ns_phx12_nearlyfreespeech_net; juliancarr_nfshost_com; peak_series_nfshost_com;
+        discreteclothing_com_NFS_NS
+        discretehats_nfshost_com; ns_phx12_nearlyfreespeech_net;
+        discretesport_com_NS;
+        juliancarr_nfshost_com; juliancarr_net_NS;
+        peak_series_nfshost_com;
         pushpeaks_NS; rockdiscrete_NS
 
     cluster (Str "nameserverGoDaddyCluster") $ do
         graphAttrs [Label (StrLabel "nameserver GoDaddy")]
-        ns0102_domaincontrol_com
+        discreteclothing_com_GoDadday_NS
 
     cluster (Str "siteNFS") $ do
         graphAttrs [Label (StrLabel "site NFS")]
         site_discretehats; site_juliancarr; site_peak_series
 
+    cluster (Str "mailNFS") $ do
+        graphAttrs [Label (StrLabel "mail NFS")]
+        discreteheadwear_com_mail_forwarding;
+        discretesport_com_mail_forwarding;
+        juliancarr_net_mail_forwarding;
+
+    mx_google
     shopify
     site_juliancarr_squarespace
 
     --------------------------------------------------
     -- registrar               --> nameserver
-    "discreteclothing_com"     --> "ns0102_domaincontrol_com"
+    "discreteclothing_com"     --> "discreteclothing_com_GoDadday_NS"
+    "discreteclothing_com"     --> "discreteclothing_com_NFS_NS"
     "discreteheadwear_com"     --> "ns_phx12_nearlyfreespeech_net"
     "ns_phx12_nearlyfreespeech_net"
                                --> "shopify"
+    "discretesport_com"        --> "discretehats_nfshost_com"
+    "discretesport_com"        --> "discretesport_com_NS"
     "juliancarr_com"           --> "juliancarr_nfshost_com"
     "juliancarr_net"           --> "juliancarr_nfshost_com"
+    "juliancarr_net"           --> "juliancarr_net_NS"
     "peak_series_com"          --> "peak_series_nfshost_com"
     "pushpeaks_com"            --> "pushpeaks_NS"
     "rockdiscrete_com"         --> "rockdiscrete_NS"
@@ -150,14 +210,25 @@ discrete = digraph (Str "discrete") $ do
     "many"                     --> "discretehats_nfshost_com"
     --------------------------------------------------
     -- nameserver              --> site
+    "discreteclothing_com_NFS_NS"
+                               --> "site_discretehats"
     "discretehats_nfshost_com" --> "site_discretehats"
     "site_discretehats"        --> "ns_phx12_nearlyfreespeech_net"
-    "ns0102_domaincontrol_com" --> "shopify"
+    "discreteclothing_com_GoDadday_NS"
+                               --> "shopify"
     "juliancarr_nfshost_com"   --> "site_juliancarr"
     "site_juliancarr"          --> "site_juliancarr_squarespace"
     "peak_series_nfshost_com"  --> "site_peak_series"
-    "site_peak_series"         --> "ns0102_domaincontrol_com"
+    "site_peak_series"         --> "discreteclothing_com_GoDadday_NS"
     "pushpeaks_NS"             --> "site_peak_series"
+    --------------------------------------------------
+    -- nameserver              --> mail/etc
+    "discreteclothing_com_NFS_NS"
+                               --> "mx_google"
+    "ns_phx12_nearlyfreespeech_net"
+                               --> "discreteheadwear_com_mail_forwarding"
+    "discretesport_com_NS"     --> "discretesport_com_mail_forwarding"
+    "juliancarr_net_NS"        --> "juliancarr_net_mail_forwarding"
 
 main :: IO ()
 main = do
