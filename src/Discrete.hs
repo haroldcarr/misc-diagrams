@@ -8,7 +8,7 @@ module Main where
 import           Data.GraphViz                     (GraphID (Str),
                                                     Shape (BoxShape), filled,
                                                     shape, style, textLabel)
-import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, FixedSize, LHead, Label, RankDir, Width),
+import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, FixedSize, LHead, Label, NodeSep, RankDir, RankSep, Width),
                                                     Color (RGB), ColorList (..),
                                                     Label (StrLabel),
                                                     NodeSize (SetNodeSize),
@@ -155,7 +155,7 @@ IP 208.94.118.220
 discrete :: G.DotGraph Text
 discrete = digraph (Str "discrete") $ do
 
-    graphAttrs [RankDir FromLeft, Compound True]
+    graphAttrs [RankDir FromLeft, Compound True, NodeSep 0.5, RankSep [3.0]]
     cluster (Str "registarNFSCluster") $ do
         graphAttrs [Label (StrLabel "registrar NFS")]
         many; discretesport_com; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
