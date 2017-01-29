@@ -30,50 +30,12 @@ rectangle     = uRectangle []
 mk "rectangle"
    -------------------------
    -- domain/registrar
-   [ ("discreetclothing_com"
-     ,"discreetclothing.com")
-   , ("discreetheadwear_com"
-     ,"discreetheadwear.com")
-   , ("discreteapparel_com"
-     ,"discreteapparel.com")
-   , ("discreteapparel_net"
-     ,"discreteapparel.net")
-   , ("discreteattire_com"
-     ,"discreteattire.com")
-   , ("discreteclothes_com"
-     ,"discreteclothes.com")
+   [ ("many"
+     ,"discreetclothing_com\n discreetheadwear_com\n discreteapparel_com\n discreteapparel_net\n discreteattire_com\n discreteclothes_com\n discreteclothing_net\n discreteclothingco_com\n discreteclothingusa_com\n discreteco_com\n discretefashion_com\n discretehats_net\n discreteheadwear_net\n discreteltd_com\n discreteofficial_com\n discretesport_com\n discretesport_net\n discretethreads_com\n discreteusa_com\n discreteworld_com")
    , ("discreteclothing_com"
      ,"discreteclothing.com")
-   , ("discreteclothing_net"
-     ,"discreteclothing.net")
-   , ("discreteclothingco_com"
-     ,"discreteclothingco.com")
-   , ("discreteclothingusa_com"
-     ,"discreteclothingusa.com")
-   , ("discreteco_com"
-     ,"discreteco.com")
-   , ("discretefashion_com"
-     ,"discretefashion.com")
-   , ("discretehats_net"
-     ,"discretehats.net")
    , ("discreteheadwear_com"
      ,"discreteheadwear.com")
-   , ("discreteheadwear_net"
-     ,"discreteheadwear.net")
-   , ("discreteltd_com"
-     ,"discreteltd.com")
-   , ("discreteofficial_com"
-     ,"discreteofficial.com")
-   , ("discretesport_com"
-     ,"discretesport.com")
-   , ("discretesport_net"
-     ,"discretesport.net")
-   , ("discretethreads_com"
-     ,"discretethreads.com")
-   , ("discreteusa_com"
-     ,"discreteusa.com")
-   , ("discreteworld_com"
-     ,"discreteworld.com")
    , ("juliancarr_com"
      ,"juliancarr.com")
    , ("juliancarr_net"
@@ -130,11 +92,7 @@ discrete = digraph (Str "discrete") $ do
     graphAttrs [RankDir FromLeft, Compound True]
     cluster (Str "registarNFSCluster") $ do
         graphAttrs [Label (StrLabel "registrar NFS")]
-        discreetclothing_com; discreetheadwear_com; discreteapparel_com; discreteapparel_net; discreteattire_com
-        discreteclothes_com; discreteclothing_net; discreteclothingco_com; discreteclothingusa_com;
-        discreteco_com; discretefashion_com; discretehats_net; discreteheadwear_net; discreteltd_com;
-        discreteofficial_com; discretesport_com; discretesport_net; discretethreads_com; discreteusa_com;
-        discreteworld_com; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
+        many; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
 
     cluster (Str "registrarGoDaddyCluster") $ do
         graphAttrs [Label (StrLabel "registrar GoDaddy")]
@@ -158,35 +116,17 @@ discrete = digraph (Str "discrete") $ do
 
     --------------------------------------------------
     -- registrar               --> nameserver
-    "discreetclothing_com"     --> "discretehats_nfshost_com"
-    "discreetheadwear_com"     --> "discretehats_nfshost_com"
-    "discreteapparel_com"      --> "discretehats_nfshost_com"
-    "discreteapparel_net"      --> "discretehats_nfshost_com"
-    "discreteattire_com"       --> "discretehats_nfshost_com"
-    "discreteclothes_com"      --> "discretehats_nfshost_com"
     "discreteclothing_com"     --> "ns0102_domaincontrol_com"
-    "discreteclothing_net"     --> "discretehats_nfshost_com"
-    "discreteclothingco_com"   --> "discretehats_nfshost_com"
-    "discreteclothingusa_com"  --> "discretehats_nfshost_com"
-    "discreteco_com"           --> "discretehats_nfshost_com"
-    "discretefashion_com"      --> "discretehats_nfshost_com"
-    "discretehats_net"         --> "discretehats_nfshost_com"
     "discreteheadwear_com"     --> "ns_phx12_nearlyfreespeech_net"
     "ns_phx12_nearlyfreespeech_net"
                                --> "shopify"
-    "discreteheadwear_net"     --> "discretehats_nfshost_com"
-    "discreteltd_com"          --> "discretehats_nfshost_com"
-    "discreteofficial_com"     --> "discretehats_nfshost_com"
-    "discretesport_com"        --> "discretehats_nfshost_com"
-    "discretesport_net"        --> "discretehats_nfshost_com"
-    "discretethreads_com"      --> "discretehats_nfshost_com"
-    "discreteusa_com"          --> "discretehats_nfshost_com"
-    "discreteworld_com"        --> "discretehats_nfshost_com"
     "juliancarr_com"           --> "juliancarr_nfshost_com"
     "juliancarr_net"           --> "juliancarr_nfshost_com"
     "peak_series_com"          --> "peak_series_nfshost_com"
     "pushpeaks_com"            --> "pushpeaks_NS"
     "rockdiscrete_com"         --> "rockdiscrete_NS"
+
+    "many"                     --> "discretehats_nfshost_com"
     --------------------------------------------------
     -- nameserver              --> site
     "discretehats_nfshost_com" --> "site_discretehats"
