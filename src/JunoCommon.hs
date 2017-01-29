@@ -58,11 +58,19 @@ mk "dataStructure"
    , ("eventWR","eventWR")
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
    , ("cmdStatusMap", "cmd\nStatusMap")
+     -- Juno.Types.Spec
+   , ("logEntries" , "log\nEntries")
+   , ("logEntriesF" , "log\nEntries")
+   , ("commitProof" , "commit\nProof")
+   , ("commitProofF" , "commit\nProof")
    ]
 
 mk "function"
-   [ -- Client
-     ("client","client")
+   [ -- misc
+     ("follower","follower")
+
+     -- Client
+   , ("client","client")
 
      -- Apps.Juno.Server main
    , ("applyFn","applyFn")
@@ -92,7 +100,7 @@ mk "function"
    , ("enqueue", "enqueue")
 
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
-   , ("applyLogEntry", "applyLogEntry")
+   , ("applyLogEntry", "apply\nLogEntry")
    , ("sendMessage", "sendMessage(s)")
    , ("publishMetric", "publishMetric")
    , ("enqueueMultiple", "enqueueMultiple")
@@ -103,35 +111,36 @@ mk "function"
 
      -- Juno.Consensus.Commit
    , ("doCommit", "doCommit")
-   , ("updateCommitIndex", "updateCommitIndex")
-   , ("checkCommitProof", "checkCommitProof")
+   , ("updateCommitIndex", "update\nCommitIndex")
+   , ("checkCommitProof", "check\nCommitProof")
 
      -- Juno.Runtime.Sender
    , ("sendDummyCollector", "*")
-   , ("sendRPC", "sendRPC")
-   , ("sendResults", "sendResults")
+   , ("sendRPC", "send\nRPC")
+   , ("sendResults", "send\nResults")
    , ("sendAppendEntries", "send(All)\nAppendEntries")
    , ("sendAppendEntriesF", "send(All)\nAppendEntries")
-   , ("sendAppendEntriesResponse", "send(All)\nAppendEntriesResponse")
-   , ("sendAppendEntriesResponseF", "send(All)\nAppendEntriesResponse")
+   , ("sendAppendEntriesResponse", "send(All)Append\nEntriesResponse")
+   , ("sendAppendEntriesResponseF", "send(All)Append\nEntriesResponse")
 
      -- Juno.Runtime.MessageReceiver
    , ("messageReceiver", "messageReceiver")
 
      -- Juno.Consensus.Handle
-   , ("handleEvents", "handleEvents")
-   , ("handleEventsF", "handleEvents")
+   , ("handleEvents", "handle\nEvents")
+   , ("handleEventsF", "handle\nEvents")
    , ("handleRPC", "handleRPC")
-   , ("issueBatch", "issueBatch")
-   , ("issueBatchF", "issueBatch")
+   , ("issueBatch", "issue\nBatch")
+   , ("issueBatchF", "issue\nBatch")
      -- Juno.Consensus.Handle.AppendEntries
-   , ("handleAppendEntries", "handleAppendEntries")
-   , ("appendLogEntries", "appendLogEntries")
-   , ("addLogEntriesAt", "addLogEntriesAt")
+   , ("handleAppendEntries", "handle\nAppendEntries")
+   , ("appendLogEntries", "append\nLogEntries")
+   , ("addLogEntriesAt", "addLog\nEntriesAt")
      -- Juno.Consensus.Handle.AppendEntriesResponse ...
    , ("handleAlotOfAers", "handleAlotOfAers")
-   , ("appendEntriesResponseH", "handle")
-   , ("updateCommitProofMap", "updateCommitProofMap")
+   , ("appendEntriesResponseH", "AER.handle")
+   , ("updateCommitProofMap", "updateCommit\nProofMap")
+   , ("updateCommitProofMapF", "updateCommit\nProofMap")
 
    , ("electionTimeoutH", "electionTimeoutH")
    , ("heartbeatTimeoutH", "heartbeatTimeoutH")
@@ -151,9 +160,9 @@ mk "function"
 
      -- ...
    , ("makeCommandResponse", "makeCommandResponse")
-   , ("applyCommand", "applyCommand")
+   , ("applyCommand", "apply\nCommand")
    , ("apply", "apply")
-   , ("applyLogEntries", "applyLogEntries")
-   , ("appendLogEntry", "appendLogEntry")
-   , ("handleCommand", "handleCommand")
+   , ("applyLogEntries", "apply\nLogEntries")
+   , ("appendLogEntry", "append\nLogEntry")
+   , ("handleCommand", "handle\nCommand")
    ]

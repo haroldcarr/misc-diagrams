@@ -42,44 +42,64 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
 
     graphAttrs [ {- RankDir FromLeft, -} Compound True]
 
-    client;
+    client; follower;
 
     "client" --> "handleEvents"
+    edge "follower" "handleEvents" [textLabel "AER"]
+    edge "follower" "handleEventsF" [textLabel "AER"]
 
     cluster (Str "leaderId") $ do
         graphAttrs [Label (StrLabel "leader")]
         handleEvents; handleCommand;
         issueBatch; doCommit; applyLogEntries; applyCommand; apply;
-        appendLogEntry; sendResults; sendAppendEntries; sendAppendEntriesResponse;
+        appendLogEntry; logEntries; commitProof;
+        sendResults; sendAppendEntries; sendAppendEntriesResponse;
         updateCommitIndex; checkCommitProof;
+        appendEntriesResponseH; updateCommitProofMap;
 
-    edge "handleEvents"         "handleCommand" [textLabel "1"]
+    edge "handleEvents"         "handleCommand" [textLabel "1.1"]
     "handleCommand" -->         "appendLogEntry"
+    "appendLogEntry" -->        "logEntries"
+    edge "appendLogEntry"       "commitProof" [textLabel "AER"]
 
-    edge "handleEvents"         "issueBatch" [textLabel "2"]
+    edge "handleEvents"         "issueBatch" [textLabel "1.2/2.2"]
     edge "issueBatch"           "doCommit" [textLabel "1"]
     edge "doCommit"             "updateCommitIndex" [textLabel "1"]
     "updateCommitIndex" -->     "checkCommitProof"
+    "checkCommitProof" -->      "commitProof"
+
     edge "doCommit"             "applyLogEntries" [textLabel "2 when quorum"]
+    edge "applyLogEntries"      "logEntries" [textLabel "0"]
     edge "applyLogEntries"      "applyCommand" [textLabel "1"]
     edge "applyCommand"         "apply"  [textLabel "app-specific"]
-    edge "applyLogEntries"      "sendResults" [textLabel "2 to clients"]
+    edge "applyLogEntries"      "sendResults" [textLabel "2"]
     "sendResults" -->           "client"
 
     edge "issueBatch"           "sendAppendEntriesResponse" [textLabel "2"]
     edge "issueBatch"           "sendAppendEntries" [textLabel "3"]
     "sendAppendEntries" -->     "handleEventsF"
+    "sendAppendEntries" -->     "follower"
+
+    edge "handleEvents"         "appendEntriesResponseH" [textLabel "2.1"]
+    "appendEntriesResponseH" -->"updateCommitProofMap"
+    "updateCommitProofMap" -->  "commitProof"
+    "appendEntriesResponseH" -->"doCommit"
 
     cluster (Str "followerId") $ do
         graphAttrs [Label (StrLabel "follower")]
-        handleEventsF; handleAppendEntries; appendLogEntries; addLogEntriesAt;
+        handleEventsF; handleAppendEntries; appendLogEntries; addLogEntriesAt; logEntriesF;
+        updateCommitProofMapF; commitProofF;
         sendAppendEntriesResponseF;
 
     "handleEventsF" -->         "handleAppendEntries"
     edge "handleAppendEntries"  "appendLogEntries"    [textLabel "1"]
     "appendLogEntries" -->      "addLogEntriesAt"
-    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "2"]
+    "addLogEntriesAt" -->       "logEntriesF"
+    edge "handleAppendEntries"  "updateCommitProofMapF"    [textLabel "2"]
+    "updateCommitProofMapF" --> "commitProofF"
+    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "3"]
     "sendAppendEntriesResponseF" --> "handleEvents"
+    "sendAppendEntriesResponseF" --> "follower"
 
 ------------------------------------------------------------------------------
 
