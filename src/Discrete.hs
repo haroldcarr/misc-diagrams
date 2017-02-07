@@ -43,8 +43,7 @@ discreteclothing.net
 discreteclothingco.com
 discreteclothingusa.com
 discreteco.com
-discretefashion.com
-+discretehats.com/HC
+discretehats.com
 discretehats.net
 discreteheadwear.net
 discreteltd.com
@@ -72,7 +71,7 @@ discreteworld.com|])
    -------------------------
    -- nameserver
    , ("discretehats_nfshost_com"
-     ,[r|"* A 208.94.116.204
+     ,[r|* A 208.94.116.204
 * TXT v=spf1 -all
 www.* CNAME discretehats.nfshost.com.|])
 
@@ -114,7 +113,8 @@ www.peak-series.com CNAME peak-series.nfshost.com.|])
      ,"pushpeaks.com A 208.94.118.220")
 
    , ("rockdiscrete_NS"
-     ,"no A nor CNAME record")
+     ,[r|rockdiscrete.combination A 208-94-116-38
+www.rockdiscrete.com CNAME discretehats.nfshost.com.|])
    -------------------------
    -- site
    , ("site_discretehats"
@@ -128,7 +128,7 @@ IP 208.94.116.38
 23.227.38.32|])
 
    , ("site_juliancarr"
-     ,[r|discretehats.nfshost.com
+     ,[r|juliancarr.nfshost.com
 IP 208.94.118.148
 .htaccess Redirect
 / https://juliancarr.squarespace.com/|])
@@ -221,6 +221,7 @@ discrete = digraph (Str "discrete") $ do
     "peak_series_nfshost_com"  --> "site_peak_series"
     "site_peak_series"         --> "discreteclothing_com_GoDadday_NS"
     "pushpeaks_NS"             --> "site_peak_series"
+    "rockdiscrete_NS"          --> "site_discretehats"
     --------------------------------------------------
     -- nameserver              --> mail/etc
     "discreteclothing_com_NFS_NS"
