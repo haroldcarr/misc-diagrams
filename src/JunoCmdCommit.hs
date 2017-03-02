@@ -57,10 +57,10 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
         updateCommitIndex; checkCommitProof;
         appendEntriesResponseH; updateCommitProofMap;
 
-    edge "handleEvents"         "handleCommand" [textLabel "1.1"]
-    "handleCommand" -->         "appendLogEntry"
-    "appendLogEntry" -->        "logEntries"
-    edge "appendLogEntry"       "commitProof" [textLabel "AER"]
+    edge "handleEvents"         "handleCommand"  [textLabel "1.1"]
+    edge "handleCommand"        "appendLogEntry" [textLabel "1"]
+    edge "appendLogEntry"       "logEntries"     [textLabel "put"]
+    edge "handleCommand"        "commitProof"    [textLabel "2\nAER"]
 
     edge "handleEvents"         "issueBatch" [textLabel "1.2/2.2"]
     edge "issueBatch"           "doCommit" [textLabel "1"]
@@ -68,10 +68,10 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
     "updateCommitIndex" -->     "checkCommitProof"
     "checkCommitProof" -->      "commitProof"
 
-    edge "doCommit"             "applyLogEntries" [textLabel "2 when quorum"]
-    edge "applyLogEntries"      "logEntries" [textLabel "0"]
+    edge "doCommit"             "applyLogEntries" [textLabel "2\nwhen quorum"]
+    edge "applyLogEntries"      "logEntries" [textLabel "0\nget"]
     edge "applyLogEntries"      "applyCommand" [textLabel "1"]
-    edge "applyCommand"         "apply"  [textLabel "app-specific"]
+    "applyCommand"  -->         "apply"
     edge "applyLogEntries"      "sendResults" [textLabel "2"]
     "sendResults" -->           "client"
 
@@ -81,23 +81,95 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
     "sendAppendEntries" -->     "follower"
 
     edge "handleEvents"         "appendEntriesResponseH" [textLabel "2.1"]
-    "appendEntriesResponseH" -->"updateCommitProofMap"
+    edge "appendEntriesResponseH" "updateCommitProofMap" [textLabel "1"]
     "updateCommitProofMap" -->  "commitProof"
-    "appendEntriesResponseH" -->"doCommit"
+    edge "appendEntriesResponseH" "doCommit"             [textLabel "2"]
 
     cluster (Str "followerId") $ do
         graphAttrs [Label (StrLabel "follower")]
-        handleEventsF; handleAppendEntries; appendLogEntries; addLogEntriesAt; logEntriesF;
+        handleEventsF; handleAppendEntries; appendLogEntries;
+        addLogEntriesAt; updateLogHashesFromIndex; logEntriesF;
         updateCommitProofMapF; commitProofF;
         sendAppendEntriesResponseF;
 
     "handleEventsF" -->         "handleAppendEntries"
-    edge "handleAppendEntries"  "appendLogEntries"    [textLabel "1"]
+    edge "handleAppendEntries"  "appendLogEntries"           [textLabel "1"]
     "appendLogEntries" -->      "addLogEntriesAt"
-    "addLogEntriesAt" -->       "logEntriesF"
-    edge "handleAppendEntries"  "updateCommitProofMapF"    [textLabel "2"]
+    "addLogEntriesAt" -->       "updateLogHashesFromIndex"
+    edge "handleAppendEntries"  "logEntriesF"                [textLabel "2\nCommit"]
+    edge "handleAppendEntries"  "updateCommitProofMapF"      [textLabel "3\nCommit"]
     "updateCommitProofMapF" --> "commitProofF"
-    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "3"]
+    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "4"]
+    "sendAppendEntriesResponseF" --> "handleEvents"
+    "sendAppendEntriesResponseF" --> "follower"
+
+------------------------------------------------------------------------------
+junoCmdCommit2 :: G.DotGraph L.Text
+junoCmdCommit2 = digraph (Str "junoCmdCommit2") $ do
+
+    graphAttrs [ {- RankDir FromLeft, -} Compound True]
+
+    client; follower;
+
+    "client" --> "handleEvents"
+    edge "follower" "handleEvents" [textLabel "AER"]
+    edge "follower" "handleEventsF" [textLabel "AER"]
+
+    cluster (Str "leaderId") $ do
+        graphAttrs [Label (StrLabel "leader")]
+        handleEvents; handleCommand;
+        issueBatch; doCommit; applyLogEntries; applyCommand; apply;
+        appendLogEntry; logEntries; commitProof;
+        sendResults; sendAppendEntries; sendAppendEntriesResponse;
+        updateCommitIndex; checkCommitProof;
+        appendEntriesResponseH; updateCommitProofMap;
+
+    edge "handleEvents"         "handleCommand"  [textLabel "1.1"]
+    edge "handleCommand"        "apply"          [textLabel "1"]
+    edge "handleCommand"        "appendLogEntry" [textLabel "2"]
+    edge "appendLogEntry"       "logEntries"     [textLabel "put"]
+    edge "handleCommand"        "commitProof"    [textLabel "3\nAER"]
+
+    edge "handleEvents"         "issueBatch" [textLabel "1.2/2.2"]
+    edge "issueBatch"           "doCommit" [textLabel "1"]
+    edge "doCommit"             "updateCommitIndex" [textLabel "1"]
+    "updateCommitIndex" -->     "checkCommitProof"
+    "checkCommitProof" -->      "commitProof"
+
+    edge "doCommit"             "applyLogEntries" [textLabel "2\nwhen quorum"]
+    edge "applyLogEntries"      "logEntries" [textLabel "0\nget"]
+    edge "applyLogEntries"      "applyCommand" [textLabel "1"]
+    edge "applyLogEntries"      "sendResults" [textLabel "2"]
+    "sendResults" -->           "client"
+
+    edge "issueBatch"           "sendAppendEntriesResponse" [textLabel "2"]
+    edge "issueBatch"           "sendAppendEntries" [textLabel "3"]
+    "sendAppendEntries" -->     "handleEventsF"
+    "sendAppendEntries" -->     "follower"
+
+    edge "handleEvents"         "appendEntriesResponseH" [textLabel "2.1"]
+    edge "appendEntriesResponseH" "updateCommitProofMap" [textLabel "1"]
+    "updateCommitProofMap" -->  "commitProof"
+    edge "appendEntriesResponseH" "doCommit"             [textLabel "2"]
+
+
+    cluster (Str "followerId") $ do
+        graphAttrs [Label (StrLabel "follower")]
+        handleEventsF; handleAppendEntries; appendLogEntries;
+        addLogEntriesAt; verifyLogHashesFromIndex; validResponses; applyF; logEntriesF;
+        updateCommitProofMapF; commitProofF;
+        sendAppendEntriesResponseF;
+
+    "handleEventsF" -->         "handleAppendEntries"
+    edge "handleAppendEntries"  "appendLogEntries"           [textLabel "1"]
+    "appendLogEntries" -->      "addLogEntriesAt"
+    "addLogEntriesAt" -->       "verifyLogHashesFromIndex"
+    edge "handleAppendEntries"  "validResponses"             [textLabel "2\nCommit"]
+    "validResponses" -->        "applyF"
+    edge "handleAppendEntries"  "logEntriesF"                [textLabel "3\nCommit\n& valid"]
+    edge "handleAppendEntries"  "updateCommitProofMapF"      [textLabel "4\nCommit\n& valid"]
+    "updateCommitProofMapF" --> "commitProofF"
+    edge "handleAppendEntries"  "sendAppendEntriesResponseF" [textLabel "5"]
     "sendAppendEntriesResponseF" --> "handleEvents"
     "sendAppendEntriesResponseF" --> "follower"
 
@@ -106,5 +178,6 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
 main :: IO ()
 main =
     doDots "/tmp"
-            [ ("junoCmdCommit", junoCmdCommit)
+            [ ("junoCmdCommit" , junoCmdCommit)
+            , ("junoCmdCommit2", junoCmdCommit2)
             ]

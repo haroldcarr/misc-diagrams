@@ -136,6 +136,9 @@ mk "function"
    , ("handleAppendEntries", "handle\nAppendEntries")
    , ("appendLogEntries", "append\nLogEntries")
    , ("addLogEntriesAt", "addLog\nEntriesAt")
+   , ("updateLogHashesFromIndex", "updateLogHashes\nFromIndex")
+   , ("verifyLogHashesFromIndex", "verifyLogHashes\nFromIndex")
+   , ("validResponses", "valid\nResponses")
      -- Juno.Consensus.Handle.AppendEntriesResponse ...
    , ("handleAlotOfAers", "handleAlotOfAers")
    , ("appendEntriesResponseH", "AER.handle")
@@ -161,7 +164,8 @@ mk "function"
      -- ...
    , ("makeCommandResponse", "makeCommandResponse")
    , ("applyCommand", "apply\nCommand")
-   , ("apply", "apply")
+   , ("apply", "app-specific\nAPPLY")
+   , ("applyF", "app-specific\nAPPLY")
    , ("applyLogEntries", "apply\nLogEntries")
    , ("appendLogEntry", "append\nLogEntry")
    , ("handleCommand", "handle\nCommand")
