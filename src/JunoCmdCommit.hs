@@ -52,7 +52,7 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
         graphAttrs [Label (StrLabel "leader")]
         handleEvents; handleCommand;
         issueBatch; doCommit; applyLogEntries; applyCommand; apply;
-        appendLogEntry; logEntries; commitProof;
+        appendLogEntry; replayMap; logEntries; commitProof;
         sendResults; sendAppendEntries; sendAppendEntriesResponse;
         updateCommitIndex; checkCommitProof;
         appendEntriesResponseH; updateCommitProofMap;
@@ -60,7 +60,8 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
     edge "handleEvents"         "handleCommand"  [textLabel "1.1"]
     edge "handleCommand"        "appendLogEntry" [textLabel "1"]
     edge "appendLogEntry"       "logEntries"     [textLabel "put"]
-    edge "handleCommand"        "commitProof"    [textLabel "2\nAER"]
+    edge "handleCommand"        "replayMap"      [textLabel "2\nput\nNothing"]
+    edge "handleCommand"        "commitProof"    [textLabel "3\nAER"]
 
     edge "handleEvents"         "issueBatch" [textLabel "1.2/2.2"]
     edge "issueBatch"           "doCommit" [textLabel "1"]
@@ -69,10 +70,11 @@ junoCmdCommit = digraph (Str "junoCmdCommit") $ do
     "checkCommitProof" -->      "commitProof"
 
     edge "doCommit"             "applyLogEntries" [textLabel "2\nwhen quorum"]
-    edge "applyLogEntries"      "logEntries" [textLabel "0\nget"]
-    edge "applyLogEntries"      "applyCommand" [textLabel "1"]
-    "applyCommand"  -->         "apply"
-    edge "applyLogEntries"      "sendResults" [textLabel "2"]
+    edge "applyLogEntries"      "logEntries"      [textLabel "0\nget"]
+    edge "applyLogEntries"      "applyCommand"    [textLabel "1"]
+    edge "applyCommand"         "apply"           [textLabel "1"]
+    edge "applyCommand"         "replayMap"       [textLabel "2\nput\nJust"]
+    edge "applyLogEntries"      "sendResults"     [textLabel "3"]
     "sendResults" -->           "client"
 
     edge "issueBatch"           "sendAppendEntriesResponse" [textLabel "2"]
@@ -119,7 +121,7 @@ junoCmdCommit2 = digraph (Str "junoCmdCommit2") $ do
         graphAttrs [Label (StrLabel "leader")]
         handleEvents; handleCommand;
         issueBatch; doCommit; applyLogEntries; applyCommand; apply;
-        appendLogEntry; logEntries; commitProof;
+        appendLogEntry; replayMap; logEntries; commitProof;
         sendResults; sendAppendEntries; sendAppendEntriesResponse;
         updateCommitIndex; checkCommitProof;
         appendEntriesResponseH; updateCommitProofMap;
@@ -128,7 +130,8 @@ junoCmdCommit2 = digraph (Str "junoCmdCommit2") $ do
     edge "handleCommand"        "apply"          [textLabel "1"]
     edge "handleCommand"        "appendLogEntry" [textLabel "2"]
     edge "appendLogEntry"       "logEntries"     [textLabel "put"]
-    edge "handleCommand"        "commitProof"    [textLabel "3\nAER"]
+    edge "handleCommand"        "replayMap"      [textLabel "3\nput\nNothing"]
+    edge "handleCommand"        "commitProof"    [textLabel "4\nAER"]
 
     edge "handleEvents"         "issueBatch" [textLabel "1.2/2.2"]
     edge "issueBatch"           "doCommit" [textLabel "1"]
@@ -137,9 +140,10 @@ junoCmdCommit2 = digraph (Str "junoCmdCommit2") $ do
     "checkCommitProof" -->      "commitProof"
 
     edge "doCommit"             "applyLogEntries" [textLabel "2\nwhen quorum"]
-    edge "applyLogEntries"      "logEntries" [textLabel "0\nget"]
-    edge "applyLogEntries"      "applyCommand" [textLabel "1"]
-    edge "applyLogEntries"      "sendResults" [textLabel "2"]
+    edge "applyLogEntries"      "logEntries"      [textLabel "0\nget"]
+    edge "applyLogEntries"      "applyCommand"    [textLabel "1"]
+    edge "applyCommand"         "replayMap"       [textLabel "2\nput\nJust"]
+    edge "applyLogEntries"      "sendResults"     [textLabel "3"]
     "sendResults" -->           "client"
 
     edge "issueBatch"           "sendAppendEntriesResponse" [textLabel "2"]

@@ -63,6 +63,8 @@ mk "dataStructure"
    , ("logEntriesF" , "log\nEntries")
    , ("commitProof" , "commit\nProof")
    , ("commitProofF" , "commit\nProof")
+   , ("replayMap", "replay\nMap")
+   , ("replayMapF", "replay\nMap")
    ]
 
 mk "function"
@@ -164,8 +166,8 @@ mk "function"
      -- ...
    , ("makeCommandResponse", "makeCommandResponse")
    , ("applyCommand", "apply\nCommand")
-   , ("apply", "app-specific\nAPPLY")
-   , ("applyF", "app-specific\nAPPLY")
+   , ("apply", "APP-SPECIFIC\nAPPLY")
+   , ("applyF", "APP-SPECIFIC\nAPPLY")
    , ("applyLogEntries", "apply\nLogEntries")
    , ("appendLogEntry", "append\nLogEntry")
    , ("handleCommand", "handle\nCommand")
