@@ -64,8 +64,10 @@ discreteworld.com|])
      ,"juliancarr.net")
    , ("peak_series_com"
      ,"+peak-series.com")
-   , ("pushpeaks_com"
-     ,"+pushpeaks.com")
+   , ("peaks"
+     ,[r|+pushpeaks.com
+peakseriesraces.com
+peakseries.net|])
    , ("rockdiscrete_com"
      ,"+rockdiscrete.com")
    -------------------------
@@ -109,8 +111,8 @@ www.juliancarr.com CNAME juliancarr.nfshost.com.|])
      ,[r|peak-series.com A 208.94.118.220
 www.peak-series.com CNAME peak-series.nfshost.com.|])
 
-   , ("pushpeaks_NS"
-     ,"pushpeaks.com A 208.94.118.220")
+   , ("peaks_NS"
+     ,"* A 208.94.118.220")
 
    , ("rockdiscrete_NS"
      ,[r|rockdiscrete.combination A 208-94-116-38
@@ -158,7 +160,7 @@ discrete = digraph (Str "discrete") $ do
     graphAttrs [RankDir FromLeft, Compound True, NodeSep 0.5, RankSep [3.0]]
     cluster (Str "registarNFSCluster") $ do
         graphAttrs [Label (StrLabel "registrar NFS")]
-        many; discretesport_com; juliancarr_com; juliancarr_net; peak_series_com; pushpeaks_com; rockdiscrete_com
+        many; discretesport_com; juliancarr_com; juliancarr_net; peak_series_com; peaks; rockdiscrete_com
 
     cluster (Str "registrarGoDaddyCluster") $ do
         graphAttrs [Label (StrLabel "registrar GoDaddy")]
@@ -171,7 +173,7 @@ discrete = digraph (Str "discrete") $ do
         discretesport_com_NS;
         juliancarr_nfshost_com; juliancarr_net_NS;
         peak_series_nfshost_com;
-        pushpeaks_NS; rockdiscrete_NS
+        peaks_NS; rockdiscrete_NS
 
     cluster (Str "nameserverGoDaddyCluster") $ do
         graphAttrs [Label (StrLabel "nameserver GoDaddy")]
@@ -204,7 +206,7 @@ discrete = digraph (Str "discrete") $ do
     "juliancarr_net"           --> "juliancarr_nfshost_com"
     "juliancarr_net"           --> "juliancarr_net_NS"
     "peak_series_com"          --> "peak_series_nfshost_com"
-    "pushpeaks_com"            --> "pushpeaks_NS"
+    "peaks"                    --> "peaks_NS"
     "rockdiscrete_com"         --> "rockdiscrete_NS"
 
     "many"                     --> "discretehats_nfshost_com"
@@ -220,7 +222,7 @@ discrete = digraph (Str "discrete") $ do
     "site_juliancarr"          --> "site_juliancarr_squarespace"
     "peak_series_nfshost_com"  --> "site_peak_series"
     "site_peak_series"         --> "discreteclothing_com_GoDadday_NS"
-    "pushpeaks_NS"             --> "site_peak_series"
+    "peaks_NS"                 --> "site_peak_series"
     "rockdiscrete_NS"          --> "site_discretehats"
     --------------------------------------------------
     -- nameserver              --> mail/etc
