@@ -67,7 +67,8 @@ discreteworld.com|])
    , ("peaks"
      ,[r|+pushpeaks.com
 peakseriesraces.com
-peakseries.net|])
+peakseries.net
+discreteseries.com|])
    , ("rockdiscrete_com"
      ,"+rockdiscrete.com")
    -------------------------
