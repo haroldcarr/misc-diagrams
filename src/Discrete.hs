@@ -65,10 +65,13 @@ discreteworld.com|])
    , ("peak_series_com"
      ,"+peak-series.com")
    , ("peaks"
-     ,[r|+pushpeaks.com
-peakseriesraces.com
+     ,[r|+cirqueseries.com
+discreteseries.com
+peak-series.com
 peakseries.net
-discreteseries.com|])
+peakseriesraces.com
+pushpeaks.com
+toposseries.com|])
    , ("rockdiscrete_com"
      ,"+rockdiscrete.com")
    -------------------------
