@@ -66,6 +66,7 @@ discreteworld.com|])
      ,"+peak-series.com")
    , ("peaks"
      ,[r|+cirqueseries.com
+cirqueseriesraces.com
 discreteseries.com
 peak-series.com
 peakseries.net
