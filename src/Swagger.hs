@@ -1,25 +1,20 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
 module Main where
 
-import           Data.GraphViz                     (GraphID (Str),
-                                                    Shape (BoxShape), filled,
-                                                    shape, style, textLabel)
-import           Data.GraphViz.Attributes.Complete (Attribute (Color, Compound, FixedSize, Label, LHead, RankDir, Width),
-                                                    Color (RGB), ColorList (..),
+import           Data.GraphViz                     (GraphID (Str), textLabel)
+import           Data.GraphViz.Attributes.Complete (Attribute (Compound, LHead, Label, RankDir),
                                                     Label (StrLabel),
-                                                    NodeSize (SetNodeSize),
-                                                    RankDir (FromLeft),
-                                                    toColorList)
-import           Data.GraphViz.HC.Util             (colorCombo2025, doDots, uRectangle)
+                                                    RankDir (FromLeft))
 import           Data.GraphViz.HC.DiagramsTH       (mk)
+import           Data.GraphViz.HC.Util             (doDots, uRectangle)
 import           Data.GraphViz.Types.Generalised   as G (DotGraph)
 import           Data.GraphViz.Types.Monadic       (Dot, cluster, digraph, edge,
-                                                    graphAttrs, node, (-->))
+                                                    graphAttrs, (-->))
 import           Data.Text.Lazy                    (Text)
-import           Data.Word                         (Word8)
 import           System.Environment                (getArgs)
 
 rectangle    :: n -> Text -> Dot n

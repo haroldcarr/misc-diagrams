@@ -20,7 +20,7 @@ library
 executable buzz
   hs-source-dirs:      src
   main-is:             Buzz.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -31,7 +31,7 @@ executable buzz
 executable catalog
   hs-source-dirs:      src
   main-is:             Catalog.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -42,7 +42,7 @@ executable catalog
 executable discrete
   hs-source-dirs:      src
   main-is:             Discrete.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -54,7 +54,7 @@ executable discrete
 executable junocmdcommit
   hs-source-dirs:      src
   main-is:             JunoCmdCommit.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -67,7 +67,20 @@ executable junocmdcommit
 executable junoserver
   hs-source-dirs:      src
   main-is:             JunoServer.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , data-graphviz-hc-util
+                     , filepath
+                     , graphviz
+                     , template-haskell
+                     , text
+  other-modules:       JunoCommon
+  default-language:    Haskell2010
+
+executable junoservernow
+  hs-source-dirs:      src
+  main-is:             JunoServerNow.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -80,7 +93,7 @@ executable junoserver
 executable swagger
   hs-source-dirs:      src
   main-is:             Swagger.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -92,7 +105,7 @@ executable swagger
 executable threepenny
   hs-source-dirs:      src
   main-is:             ThreePenny.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath

@@ -1,34 +1,27 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
+
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
 {-
 Created       : 2014 Feb 26 (Wed) 18:54:30 by Harold Carr.
-Last Modified : 2016 Jul 30 (Sat) 08:17:06 by Harold Carr.
+Last Modified : 2018 Jul 24 (Tue) 16:49:26 by Harold Carr.
 -}
 
 module Main where
 
-import           Data.GraphViz                          (filled, shape, style,
-                                                         textLabel)
-import           Data.GraphViz.Attributes.Colors.Brewer (BrewerColor (BC),
-                                                         BrewerName (Pastel2),
-                                                         BrewerScheme (BScheme))
-import           Data.GraphViz.Attributes.Complete      (Attribute (Color, FixedSize, Height, RankDir, Width),
-                                                         NodeSize (SetNodeSize),
-                                                         Number (Int),
-                                                         RankDir (FromLeft), Shape (Circle, BoxShape, DiamondShape, DoubleCircle),
-                                                         toColor, toColorList)
-import           Data.GraphViz.HC.Util                  (doDots, pastel28,
-                                                         startEndClosedState, state, transition, decision)
-import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
-import           Data.GraphViz.Types.Monadic            (Dot,
-                                                         GraphID (Str, Num),
-                                                         cluster, digraph, edge,
-                                                         graphAttrs, node,
-                                                         (-->))
-import           Data.Text.Lazy                         as L (Text)
-import           Data.Word                              (Word8)
+import           Data.GraphViz                     (textLabel)
+import           Data.GraphViz.Attributes.Complete (Attribute (RankDir),
+                                                    Number (Int),
+                                                    RankDir (FromLeft))
+import           Data.GraphViz.HC.Util             (decision, doDots,
+                                                    startEndClosedState, state,
+                                                    transition)
+import qualified Data.GraphViz.Types.Generalised   as G (DotGraph)
+import           Data.GraphViz.Types.Monadic       (Dot, GraphID (Num, Str),
+                                                    cluster, digraph, edge,
+                                                    graphAttrs, (-->))
+import           Data.Text.Lazy                    as L (Text)
 
 ------------------------------------------------------------------------------
 -- STATES

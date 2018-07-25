@@ -1,9 +1,10 @@
 {-
 Created       : 2014 Jul 24 (Thu) 09:37:09 by Harold Carr.
-Last Modified : 2016 Feb 07 (Sun) 06:29:41 by Harold Carr.
+Last Modified : 2018 Jul 24 (Tue) 16:56:54 by Harold Carr.
 -}
 
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
@@ -13,8 +14,8 @@ import           Data.GraphViz                     (GraphvizCommand (Fdp),
                                                     textLabel)
 import           Data.GraphViz.Attributes.Complete (Attribute (Height, RankDir, Width),
                                                     RankDir (FromLeft))
-import           Data.GraphViz.HC.Util             (doDots', uCircle, uCircle',
-                                                    uDiamond, uDoubleCircle,
+import           Data.GraphViz.HC.Util             (doDots', uCircle', uDiamond,
+                                                    uDoubleCircle,
                                                     uDoubleOctagon, uFixedSize,
                                                     uRectangle, uRectangle',
                                                     uStar, uTriangle)

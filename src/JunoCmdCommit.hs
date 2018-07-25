@@ -1,39 +1,24 @@
+{-# OPTIONS_GHC -fno-warn-type-defaults #-}
+
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE TemplateHaskell      #-}
-{-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
 module Main where
 
 import           JunoCommon
 
-import           Data.GraphViz                          (GraphvizCommand (TwoPi),
-                                                         filled, shape, style,
-                                                         textLabel)
-import           Data.GraphViz.Attributes.Colors.Brewer (BrewerColor (BC),
-                                                         BrewerName (Pastel2),
-                                                         BrewerScheme (BScheme))
-import           Data.GraphViz.Attributes.Complete      (Attribute (Color, Compound, FixedSize, Height, Label, RankDir, Width),
-                                                         Color (RGB),
-                                                         ColorList (..),
-                                                         Label (StrLabel),
-                                                         NodeSize (SetNodeSize),
-                                                         Number (Int),
-                                                         RankDir (FromLeft),
-                                                         Shape (BoxShape, Circle, DiamondShape, DoubleCircle),
-                                                         toColor, toColorList)
-import           Data.GraphViz.HC.DiagramsTH            (mk)
-import           Data.GraphViz.HC.Util                  (doDots, uCircle',
-                                                         uRectangle)
-import qualified Data.GraphViz.Types.Generalised        as G (DotGraph)
-import           Data.GraphViz.Types.Monadic            (Dot,
-                                                         GraphID (Num, Str),
-                                                         cluster, digraph, edge,
-                                                         graphAttrs, node,
-                                                         (-->))
-import qualified Data.Text.Lazy                         as L (Text)
-import           Data.Word                              (Word8)
+import           Data.GraphViz                     (textLabel)
+import           Data.GraphViz.Attributes.Complete (Attribute (Compound, Label),
+                                                    Label (StrLabel))
+import           Data.GraphViz.HC.Util             (doDots)
+import qualified Data.GraphViz.Types.Generalised   as G (DotGraph)
+import           Data.GraphViz.Types.Monadic       (GraphID (Str), cluster,
+                                                    digraph, edge, graphAttrs,
+                                                    (-->))
+import qualified Data.Text.Lazy                    as L (Text)
 default (L.Text)
+
+{-# ANN module "HLint: ignore Reduce duplication" #-}
 
 ------------------------------------------------------------------------------
 

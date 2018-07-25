@@ -1,15 +1,17 @@
 {-
 Created       : 2014 Jul 24 (Thu) 09:37:09 by Harold Carr.
-Last Modified : 2016 Feb 07 (Sun) 06:30:58 by Harold Carr.
+Last Modified : 2018 Jul 24 (Tue) 16:49:32 by Harold Carr.
 -}
 
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 
 module Main where
 
-import           Data.GraphViz                     (GraphID (Str), GraphvizCommand (Fdp, Fdp, TwoPi))
+import           Data.GraphViz                     (GraphID (Str),
+                                                    GraphvizCommand (Fdp, Fdp))
 import           Data.GraphViz.Attributes.Complete (Attribute (RankDir),
                                                     RankDir (FromLeft))
 import           Data.GraphViz.HC.Util             (doDots', uRectangle)
