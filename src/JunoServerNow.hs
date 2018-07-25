@@ -8,8 +8,9 @@ module Main where
 import           JunoCommon
 
 import           Data.GraphViz                     (textLabel)
-import           Data.GraphViz.Attributes.Complete (Attribute (Label, RankDir),
+import           Data.GraphViz.Attributes.Complete (Attribute (Label, Pad, NodeSep, RankSep, RankDir),
                                                     Label (StrLabel),
+                                                    DPoint (DVal),
                                                     RankDir (FromLeft))
 import           Data.GraphViz.HC.Util             (doDots)
 import qualified Data.GraphViz.Types.Generalised   as G (DotGraph)
@@ -23,6 +24,11 @@ default (L.Text)
 
 junoServerNow :: G.DotGraph L.Text
 junoServerNow = digraph (Str "junoServerNow") $ do
+    cluster (Str "RaftStateBox") $ do
+        graphAttrs [Label (StrLabel "RaftState")]
+        logEntries; commitIndex; commitProof; replayMap; membershipState;
+        recentAndTentativeStates;
+
     cluster (Str "Command.hsBox") $ do
         graphAttrs [Label (StrLabel "Command.hs")]
         junoEnv; runCommand
@@ -45,15 +51,16 @@ junoServerNow = digraph (Str "junoServerNow") $ do
         graphAttrs [Label (StrLabel "Handle.hs")]
         handleEvents; handleRPC; issueBatch
 
-    cluster (Str "H.AppendEntriesResponse.hsBox") $ do
-        graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
-        handleAlotOfAers; appendEntriesResponseH; updateCommitProofMap;
 
     cluster (Str "Runtime.Timer.hsBox") $ do
         graphAttrs [Label (StrLabel "Timer.hs")]
         electionTimer; heartbeatTimer;
 
-    graphAttrs [RankDir FromLeft]
+    graphAttrs [ RankDir FromLeft
+               , Pad (DVal 0.5)
+               , NodeSep 0.5
+               , RankSep [1.0]
+               ]
     applyFn;
     inboxWR; outboxWR; rvAndRvrWR; cmdInboxWR; aerInboxWR;
     zmqSocketPull; zmqSocketPush;
@@ -62,6 +69,10 @@ junoServerNow = digraph (Str "junoServerNow") $ do
     doCommit;
     electionTimeoutH; heartbeatTimeoutH;
     appendEntriesH; requestVoteH; requestVoteResponseH; commandH; revolutionH;
+    commitAndPropagateCollector;
+    --cluster (Str "H.AppendEntriesResponse.hsBox") $ do
+    --    graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
+    handleAlotOfAers; appendEntriesResponseH; updateCommitProofMap;
 
     -- Apps.Juno.Server main
     "runCommand" --> "junoEnv"
@@ -94,7 +105,7 @@ junoServerNow = digraph (Str "junoServerNow") $ do
     "enqueueLater" --> "eventWR"
 
     -- Juno.Consensus.Commit
-    "doCommit" --> "applyLogEntry"
+    "doCommit" --> "*"
 
     -- Juno.Runtime.Sender (Now/OK)
     "sendRPC"  --> "sendMessage"
@@ -109,12 +120,15 @@ junoServerNow = digraph (Str "junoServerNow") $ do
     "issueBatch" --> "doCommit"
     "issueBatch" --> "sendAppendEntries"
     "issueBatch" --> "sendAppendEntriesResponse"
+
     -- Juno.Consensus.Handle.AppendEntriesResponse
     "handleEvents" --> "handleAlotOfAers"
     "handleAlotOfAers" --> "appendEntriesResponseH"
     "appendEntriesResponseH" --> "updateCommitProofMap"
     "appendEntriesResponseH" --> "doCommit"
     "appendEntriesResponseH" --> "electionTimer"
+    "updateCommitProofMap"   --> "commitProof"
+
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
     edge "electionTimeoutH" "sendRPC" [textLabel "castLazyVote |\nsendRequestVote"]
@@ -138,8 +152,17 @@ junoServerNow = digraph (Str "junoServerNow") $ do
     "requestVoteResponseH" --> "sendAppendEntries"
     "requestVoteResponseH" --> "electionTimer"
     "requestVoteResponseH" --> "heartbeatTimer"
+
+    -- Juno.Consensus.Handle.Command
     edge "commandH" "sendRPC" [textLabel "RetransmitToLeader |\nSendCommandResponse"]
-    edge "commandH" "updateCommitProofMap" [textLabel "CommitAndPropagate"] -- TODO: what propagate?
+    -- TODO: what propagate?
+    edge "commandH" "commitAndPropagateCollector" [textLabel "CommitAndPropagate"]
+    "commitAndPropagateCollector" --> "applyLogEntry"
+    "commitAndPropagateCollector" --> "logEntries"
+    "commitAndPropagateCollector" --> "recentAndTentativeStates"
+    "commitAndPropagateCollector" --> "replayMap"
+    "commitAndPropagateCollector" --> "updateCommitProofMap"
+
     -- Juno.Runtime.Timer (Now/OK)
     "electionTimer" --> "enqueueLater"
     "heartbeatTimer" --> "enqueueLater"

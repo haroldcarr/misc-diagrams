@@ -41,10 +41,13 @@ mk "dataStructure"
      -- Juno.Types.Spec
    , ("logEntries" , "log\nEntries")
    , ("logEntriesF" , "log\nEntries")
+   , ("commitIndex" , "commit\nIndex")
    , ("commitProof" , "commit\nProof")
    , ("commitProofF" , "commit\nProof")
    , ("replayMap", "replay\nMap")
    , ("replayMapF", "replay\nMap")
+   , ("membershipState", "membership\nState")
+   , ("recentAndTentativeStates", "rctTent\nStates")
    ]
 
 mk "function"
@@ -122,10 +125,10 @@ mk "function"
    , ("verifyLogHashesFromIndex", "verifyLogHashes\nFromIndex")
    , ("validResponses", "valid\nResponses")
      -- Juno.Consensus.Handle.AppendEntriesResponse ...
-   , ("handleAlotOfAers", "handleAlotOfAers")
-   , ("appendEntriesResponseH", "AER.handle")
-   , ("updateCommitProofMap", "updateCommit\nProofMap")
-   , ("updateCommitProofMapF", "updateCommit\nProofMap")
+   , ("handleAlotOfAers", "AER\nhandleAlotOfAers")
+   , ("appendEntriesResponseH", "AER\nhandle")
+   , ("updateCommitProofMap", "AER\nupdateCommit\nProofMap")
+   , ("updateCommitProofMapF", "AER\nupdateCommit\nProofMap")
 
    , ("electionTimeoutH", "electionTimeoutH")
    , ("heartbeatTimeoutH", "heartbeatTimeoutH")
@@ -138,6 +141,7 @@ mk "function"
      --     Juno.Consensus.Handle.Command
    , ("handleSingleCommand", "handleSingleCommand")
    , ("commandHandle", "commandHandle")
+   , ("commitAndPropagateCollector", "*")
 
      -- Juno.Runtime.Timer
    , ("electionTimer", "electionTimer")
