@@ -5,11 +5,10 @@
 
 module Main where
 
-import           JunoCommon
-
 import           Data.GraphViz                     (textLabel)
-import           Data.GraphViz.Attributes.Complete (Attribute (Label, RankDir),
+import           Data.GraphViz.Attributes.Complete (Attribute (Label, Pad, NodeSep, RankSep, RankDir),
                                                     Label (StrLabel),
+                                                    DPoint (DVal),
                                                     RankDir (FromLeft))
 import           Data.GraphViz.HC.Util             (doDots)
 import qualified Data.GraphViz.Types.Generalised   as G (DotGraph)
@@ -17,109 +16,105 @@ import           Data.GraphViz.Types.Monadic       (GraphID (Str), cluster,
                                                     digraph, edge, graphAttrs,
                                                     (-->))
 import qualified Data.Text.Lazy                    as L (Text)
+------------------------------------------------------------------------------
+import           Juno.JunoCommon
 default (L.Text)
 
 ------------------------------------------------------------------------------
 
-junoServer :: G.DotGraph L.Text
-junoServer = digraph (Str "junoServer") $ do
+junoServerNow :: G.DotGraph L.Text
+junoServerNow = digraph (Str "junoServerNow") $ do
+    cluster (Str "RaftStateBox") $ do
+        graphAttrs [Label (StrLabel "RaftState")]
+        logEntries; commitIndex; commitProof; replayMap; membershipState;
+        recentAndTentativeStates;
+
     cluster (Str "Command.hsBox") $ do
         graphAttrs [Label (StrLabel "Command.hs")]
-        junoEnv; runCommand
+        appState; runOrCommitCommand
 
     cluster (Str "ReceiverEnvBox") $ do
-        graphAttrs [Label (StrLabel "ReceiverEnv")]
+        graphAttrs [Label (StrLabel "ReceiverEnv/MessageReceiver")]
         getMessages; getNewCommands; getNewEvidence; getRvAndRVRs; enqueue
 
-    cluster (Str "RaftSpecBox") $ do
-        graphAttrs [Label (StrLabel "RaftSpec")]
+    cluster (Str "RaftSpecBox1") $ do
+        graphAttrs [Label (StrLabel "RaftSpec1")]
         applyLogEntry; sendMessage;
-        publishMetric; enqueueMultiple; enqueueLater; dequeue; updateCmdMap;
-        cmdStatusMap; dequeueFromApi;
+
+    cluster (Str "RaftSpecBox2") $ do
+        graphAttrs [Label (StrLabel "RaftSpec2")]
+        dequeue; enqueueLater;
 
     cluster (Str "Sender.hsBox") $ do
         graphAttrs [Label (StrLabel "Sender.hs")]
-        sendDummyCollector; sendRPC; sendAppendEntries; sendAppendEntriesResponse;
-
-    cluster (Str "Handle.hsBox") $ do
-        graphAttrs [Label (StrLabel "Handle.hs")]
-        handleEvents; handleRPC; issueBatch
-
-    cluster (Str "H.AppendEntriesResponse.hsBox") $ do
-        graphAttrs [Label (StrLabel "H.AppendEntriesResponse.hs")]
-        handleAlotOfAers; appendEntriesResponseH; updateCommitProofMap;
+        sendRPC; sendAppendEntries; sendAppendEntriesResponse;
+        sendResults;
 
     cluster (Str "Runtime.Timer.hsBox") $ do
         graphAttrs [Label (StrLabel "Timer.hs")]
         electionTimer; heartbeatTimer;
 
-    graphAttrs [RankDir FromLeft]
-    applyFn;
+    cluster (Str "HandleBox") $ do
+        graphAttrs [Label (StrLabel "Handle")]
+        handleEvents; handleRPC; issueBatch
+        doCommit; handleAlotOfAers; commitAndPropagateCollector;
+        appendEntriesH; appendEntriesResponseH;
+        commandH; commandResponseH; cqH; cqrH;
+        electionTimeoutH; heartbeatTimeoutH;
+        msdH; requestVoteH; requestVoteResponseH; revolutionH;
+
+    graphAttrs [ RankDir FromLeft
+               , Pad (DVal 0.5)
+               , NodeSep 0.5
+               , RankSep [1.0]
+               ]
+
+    -- Transport/ZMQ
     inboxWR; outboxWR; rvAndRvrWR; cmdInboxWR; aerInboxWR;
     zmqSocketPull; zmqSocketPush;
-    toFromCommands;
+
     eventWR;
-    runCommand; applyFn;
-    commandMVarMap;
-    runApiServer; apiEnv;
-    messageReceiver
-    pubMetric; updateCmdMapFn;
-    doCommit;
-    electionTimeoutH; heartbeatTimeoutH;
-    appendEntriesH; requestVoteH; requestVoteResponseH; commandH; revolutionH;
 
     -- Apps.Juno.Server main
-    "runCommand" --> "junoEnv"
-    "applyFn" --> "runCommand"
+    "runOrCommitCommand" --> "appState"
 
     -- Juno.Spec.Simple runJuno
 
-    -- Juno.Runtime.Api.ApiServer
-    "commandMVarMap" --> "runApiServer"
-    "runApiServer"   --> "toFromCommands"
-    "apiEnv" --> "runApiServer"
-
-    -- Juno.Messaging.ZMQ runMsgServer
+    -- Juno.Messaging.ZMQ runMsgServer (Now/OK)
     edge "zmqSocketPull"    "rvAndRvrWR" [textLabel "RV | RVR"]
     edge "zmqSocketPull"    "cmdInboxWR" [textLabel "CMD | CMDB"]
     edge "zmqSocketPull"    "aerInboxWR" [textLabel "AER"]
     edge "zmqSocketPull"    "inboxWR"    [textLabel "otherwise"]
+    edge "outboxWR"      "zmqSocketPush" [textLabel "send rolodex"]
 
-    edge "outboxWR"       "zmqSocketPush" [textLabel "send rolodex"]
-
-    -- ReceiverEnv : Juno.Runtime.MessageReceiver
+    -- ReceiverEnv : Juno.Runtime.MessageReceiver (Now/OK)
     "inboxWR" --> "getMessages"
     "cmdInboxWR" --> "getNewCommands"
     "aerInboxWR" --> "getNewEvidence"
     "rvAndRvrWR" --> "getRvAndRVRs"
     "enqueue" --> "eventWR"
+    edge "getMessages"    "enqueue" [textLabel "ERPC"]
+    edge "getNewCommands" "enqueue" [textLabel "ERPC"]
+    edge "getNewEvidence" "enqueue" [textLabel "AERs"]
+    edge "getRvAndRVRs"   "enqueue" [textLabel "ERPC"]
 
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
-    "applyLogEntry" --> "applyFn"
+    "applyLogEntry" --> "runOrCommitCommand"
     "sendMessage" --> "outboxWR"
-    "publishMetric" --> "pubMetric"
-    "enqueueMultiple" --> "eventWR"
-    "enqueueLater" --> "eventWR"
     "eventWR" --> "dequeue"
-    "updateCmdMapFn" --> "updateCmdMap"
-    "commandMVarMap" --> "cmdStatusMap"
-    "toFromCommands" --> "dequeueFromApi"
+    "enqueueLater" --> "eventWR"
 
     -- Juno.Consensus.Commit
-    "doCommit" --> "applyLogEntry"
+    "doCommit" --> "commitProof"
+    "doCommit" --> "commitIndex"
+    edge "doCommit"  "sendResults" [textLabel "if Leader"]
+    edge "doCommit"  "applyLogEntry" [textLabel "commit"]
 
-    -- Juno.Runtime.Sender
-    "sendRPC"  --> "sendDummyCollector"
-    "sendAppendEntries" --> "sendDummyCollector"
-    "sendAppendEntriesResponse" --> "sendDummyCollector"
-    "sendDummyCollector" --> "sendMessage"
-
-    -- Juno.Runtime.MessageReceiver
-    "getMessages" --> "messageReceiver"
-    "getNewCommands" --> "messageReceiver"
-    "getNewEvidence" --> "messageReceiver"
-    "getRvAndRVRs" --> "messageReceiver"
-    "messageReceiver" --> "enqueue"
+    -- Juno.Runtime.Sender (Now/OK)
+    "sendRPC"  --> "sendMessage"
+    "sendAppendEntries" --> "sendRPC"
+    "sendAppendEntriesResponse" --> "sendRPC"
+    "sendResults" --> "sendRPC"
 
     -- Juno.Consensus.Handle
     "dequeue" --> "handleEvents"
@@ -128,12 +123,14 @@ junoServer = digraph (Str "junoServer") $ do
     "issueBatch" --> "doCommit"
     "issueBatch" --> "sendAppendEntries"
     "issueBatch" --> "sendAppendEntriesResponse"
+
     -- Juno.Consensus.Handle.AppendEntriesResponse
     "handleEvents" --> "handleAlotOfAers"
     "handleAlotOfAers" --> "appendEntriesResponseH"
-    "appendEntriesResponseH" --> "updateCommitProofMap"
+    "appendEntriesResponseH" --> "commitProof"
     "appendEntriesResponseH" --> "doCommit"
     "appendEntriesResponseH" --> "electionTimer"
+
     -- Juno.Consensus.Handle.ElectionTimeout
     "handleEvents" --> "electionTimeoutH"
     edge "electionTimeoutH" "sendRPC" [textLabel "castLazyVote |\nsendRequestVote"]
@@ -147,9 +144,13 @@ junoServer = digraph (Str "junoServer") $ do
 
     "handleRPC" --> "appendEntriesH"
     "handleRPC" --> "appendEntriesResponseH"
+    "handleRPC" --> "commandH"
+    "handleRPC" --> "commandResponseH"
+    "handleRPC" --> "cqH"
+    "handleRPC" --> "cqrH"
+    "handleRPC" --> "msdH"
     "handleRPC" --> "requestVoteH"
     "handleRPC" --> "requestVoteResponseH"
-    "handleRPC" --> "commandH"
     "handleRPC" --> "revolutionH"
 
     "appendEntriesH" --> "sendAppendEntriesResponse"
@@ -157,13 +158,25 @@ junoServer = digraph (Str "junoServer") $ do
     "requestVoteResponseH" --> "sendAppendEntries"
     "requestVoteResponseH" --> "electionTimer"
     "requestVoteResponseH" --> "heartbeatTimer"
+
+    -- Juno.Consensus.Handle.Command
     edge "commandH" "sendRPC" [textLabel "RetransmitToLeader |\nSendCommandResponse"]
-    edge "commandH" "updateCommitProofMap" [textLabel "CommitAndPropagate"] -- TODO: what propagate?
+    -- TODO: what propagate?
+    edge "commandH" "commitAndPropagateCollector" [textLabel "CommitAndPropagate"]
+    edge "commitAndPropagateCollector" "applyLogEntry" [textLabel "apply"]
+    "commitAndPropagateCollector" --> "logEntries"
+    "commitAndPropagateCollector" --> "recentAndTentativeStates"
+    "commitAndPropagateCollector" --> "replayMap"
+    "commitAndPropagateCollector" --> "commitProof"
+
+    -- Juno.Runtime.Timer (Now/OK)
+    "electionTimer" --> "enqueueLater"
+    "heartbeatTimer" --> "enqueueLater"
 
 ------------------------------------------------------------------------------
 
 main :: IO ()
 main =
     doDots "/tmp"
-            [ ("junoServer"   , junoServer)
+            [ ("junoServerNow"   , junoServerNow)
             ]

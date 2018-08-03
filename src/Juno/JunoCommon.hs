@@ -5,10 +5,10 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE TemplateHaskell      #-}
 
-module JunoCommon where
+module Juno.JunoCommon where
 
 import           Data.GraphViz.HC.DiagramsTH (mk)
-import           Data.GraphViz.HC.Util       (uCircle', uRectangle)
+import           Data.GraphViz.HC.Util       (uCircle', uDiamond', uRectangle)
 import           Data.GraphViz.Types.Monadic (Dot)
 import qualified Data.Text.Lazy              as L (Text)
 default (L.Text)
@@ -18,6 +18,9 @@ function       = uRectangle []
 
 dataStructure :: n -> L.Text -> Dot n
 dataStructure  = uCircle'
+
+predicate     :: n -> L.Text -> Dot n
+predicate      = uDiamond'
 
 ------------------------------------------------------------------------------
 -- SERVER
@@ -29,6 +32,7 @@ mk "dataStructure"
 
      -- App.Juno.Command
    , ("junoEnv", "JunoEnv")
+   , ("appState", "App\nState")
      -- Juno.Spec.Simple runJuno
    , ("inboxWR","inboxWR")
    , ("cmdInboxWR", "cmdInboxWR")
@@ -39,15 +43,18 @@ mk "dataStructure"
      -- RaftSpec: Juno.Spec.Simple simpleRaftSpec
    , ("cmdStatusMap", "cmd\nStatusMap")
      -- Juno.Types.Spec
-   , ("logEntries" , "log\nEntries")
-   , ("logEntriesF" , "log\nEntries")
    , ("commitIndex" , "commit\nIndex")
    , ("commitProof" , "commit\nProof")
    , ("commitProofF" , "commit\nProof")
+   , ("currentLeader" , "current\nLeader")
+   , ("logEntries" , "log\nEntries")
+   , ("logEntriesF" , "log\nEntries")
+   , ("membershipState", "membership\nState")
+   , ("quorumSize" , "quorum\nSize")
+   , ("recentAndTentativeStates", "rctTent\nStates")
    , ("replayMap", "replay\nMap")
    , ("replayMapF", "replay\nMap")
-   , ("membershipState", "membership\nState")
-   , ("recentAndTentativeStates", "rctTent\nStates")
+   , ("term", "term")
    ]
 
 mk "function"
@@ -62,6 +69,7 @@ mk "function"
 
      -- App.Juno.Command
    , ("runCommand", "runCommand")
+   , ("runOrCommitCommand", "runCommand\ncommitCommand")
 
      -- Juno.Spec.Simple runJuno
    , ("pubMetric", "pubMetric")
@@ -130,12 +138,16 @@ mk "function"
    , ("updateCommitProofMap", "AER\nupdateCommit\nProofMap")
    , ("updateCommitProofMapF", "AER\nupdateCommit\nProofMap")
 
+   , ("appendEntriesH", "appendEntriesH")
+   , ("commandH", "commandH")
+   , ("commandResponseH", "command\nResponseH")
+   , ("cqH", "cqH")
+   , ("cqrH", "cqrH")
    , ("electionTimeoutH", "electionTimeoutH")
    , ("heartbeatTimeoutH", "heartbeatTimeoutH")
-   , ("appendEntriesH", "appendEntriesH")
+   , ("msdH", "msdH")
    , ("requestVoteH", "requestVoteH")
    , ("requestVoteResponseH", "requestVoteResponseH")
-   , ("commandH", "commandH")
    , ("revolutionH", "revolutionH")
 
      --     Juno.Consensus.Handle.Command
@@ -155,4 +167,54 @@ mk "function"
    , ("applyLogEntries", "apply\nLogEntries")
    , ("appendLogEntry", "append\nLogEntry")
    , ("handleCommand", "handle\nCommand")
+   ]
+
+------------------------------------------------------------------------------
+-- AppendEntries
+
+mk "dataStructure"
+   [ ("ignore", "Ignore")
+   , ("sendUnconvincedResponse", "Send\nUnconvinced\nResponse")
+   , ("validLeaderAndTerm", "ValidLeader\nAndTerm")
+   , ("sendFailureResponse", "SendFailure\nResponse")
+   ]
+
+mk "function"
+   [ -- pure
+     ("aehandleAppendEntries", "handle\nAppend\nEntries*")
+   , ("myActiveAssignments", "myActive\nAsmnts")
+   , ("checkForNewLeader", "checkFor\nNewLeader")
+   , ("dropIdenticalLEs", "drop\nIdentical\nLEs")
+   , ("aeappendLogEntries", "append\nLogEntries")
+     -- Raft
+   , ("applyNewLeader", "apply\nNewLeader")
+   , ("aesendAppendEntriesResponse1", "sendAppend\nEntries\nResponse")
+   , ("aesendAppendEntriesResponse2", "sendAppend\nEntries\nResponse")
+   , ("aesendAppendEntriesResponse3", "sendAppend\nEntries\nResponse")
+   , ("aesendAppendEntriesResponse4", "sendAppend\nEntries\nResponse")
+   , ("aesendAppendEntriesResponse5", "sendAppend\nEntries\nResponse")
+   , ("aesendAllAppendEntriesResponse", "sendAllAppend\nEntries\nResponse")
+   , ("resetElectionTimer", "reset\nElection\nTimer")
+   , ("setLazyVoteToNothing", "setLazyVote\n.= Nothing")
+   , ("validateProposedLogEntries", "validateProposed\nLogEntries")
+   , ("applyCommandAndCompareLogEntries", "applyCommandAnd\nCompareLogEntries")
+   , ("recoverPage", "recover\nPage")
+   , ("whenRemovedEntriesJunoBFTFlaw", "whenRemoved\nEntries\nJuno BFT Flaw")
+   , ("addLogEntriesAfter", "addLog\nEntriesAfter")
+   , ("aeerror", "error")
+   , ("removeUnfinishedReplaysAddNew", "remove\nUnfinished\nReplays\nAdd New")
+   , ("updateRecentAndTentativeStates", "update\nRecentAnd\nTentativeStates")
+   , ("aeupdateCommitProofMap", "update\nCommit\nProofMap")
+   ]
+
+mk "predicate"
+   [ --  pure
+     ("isActiveP", "active?")
+   , ("prevLI_GE_CI_or_nullLEs", "prevLI >= CI\n|| null LEs")
+   , ("prevLI_plus_lenLEs_LE_CI", "prevLI + lenLEs\n<= CI")
+   , ("prevLEMatches", "prev LE\nmatchs")
+   , ("caseCurrentLeader", "current\nLeader")
+     -- Raft
+   , ("casePreState", "case\nPreState")
+   , ("validResponse", "valid\nResponse")
    ]

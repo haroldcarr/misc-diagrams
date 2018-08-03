@@ -9,7 +9,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     JunoCommon
+  exposed-modules:     Juno.JunoCommon
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
@@ -52,42 +52,55 @@ executable discrete
   default-language:    Haskell2010
 
 executable junocmdcommit
-  hs-source-dirs:      src
+  hs-source-dirs:      src/Juno
   main-is:             JunoCmdCommit.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
                      , graphviz
+                     , misc-diagrams
                      , template-haskell
                      , text
-  other-modules:       JunoCommon
+  default-language:    Haskell2010
+
+executable junoae
+  hs-source-dirs:      src/Juno
+  main-is:             JunoAE.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , data-graphviz-hc-util
+                     , filepath
+                     , graphviz
+                     , misc-diagrams
+                     , template-haskell
+                     , text
   default-language:    Haskell2010
 
 executable junoserver
-  hs-source-dirs:      src
+  hs-source-dirs:      src/Juno
   main-is:             JunoServer.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
                      , graphviz
+                     , misc-diagrams
                      , template-haskell
                      , text
-  other-modules:       JunoCommon
   default-language:    Haskell2010
 
 executable junoservernow
-  hs-source-dirs:      src
+  hs-source-dirs:      src/Juno
   main-is:             JunoServerNow.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
                      , filepath
                      , graphviz
+                     , misc-diagrams
                      , template-haskell
                      , text
-  other-modules:       JunoCommon
   default-language:    Haskell2010
 
 executable swagger

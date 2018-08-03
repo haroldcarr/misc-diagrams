@@ -5,8 +5,6 @@
 
 module Main where
 
-import           JunoCommon
-
 import           Data.GraphViz                     (textLabel)
 import           Data.GraphViz.Attributes.Complete (Attribute (Compound, Label),
                                                     Label (StrLabel))
@@ -16,6 +14,8 @@ import           Data.GraphViz.Types.Monadic       (GraphID (Str), cluster,
                                                     digraph, edge, graphAttrs,
                                                     (-->))
 import qualified Data.Text.Lazy                    as L (Text)
+------------------------------------------------------------------------------
+import           Juno.JunoCommon
 default (L.Text)
 
 {-# ANN module "HLint: ignore Reduce duplication" #-}
