@@ -90,6 +90,19 @@ executable junocmdcommit
                      , text
   default-language:    Haskell2010
 
+executable junocommit
+  hs-source-dirs:      src/Juno
+  main-is:             JunoCommit.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , data-graphviz-hc-util
+                     , filepath
+                     , graphviz
+                     , misc-diagrams
+                     , template-haskell
+                     , text
+  default-language:    Haskell2010
+
 executable junoserver
   hs-source-dirs:      src/Juno
   main-is:             JunoServer.hs
