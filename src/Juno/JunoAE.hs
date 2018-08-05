@@ -28,13 +28,14 @@ junoAE = digraph (Str "junoAE") $ do
     cluster (Str "AERaftStateBox") $ do
         graphAttrs [Label (StrLabel "AE RaftState")]
         applyNewLeader;
-        aesendAppendEntriesResponse1; aesendAppendEntriesResponse2; aesendAppendEntriesResponse3;
-        aesendAppendEntriesResponse4; aesendAppendEntriesResponse5; aesendAllAppendEntriesResponse;
         resetElectionTimer; setLazyVoteToNothing;
         casePreState; validateProposedLogEntries; applyCommandAndCompareLogEntries;
         validResponse; recoverPage; whenRemovedEntriesJunoBFTFlaw; addLogEntriesAfter;
         aeerror; removeUnfinishedReplaysAddNew; updateRecentAndTentativeStates;
         aeupdateCommitProofMap;
+        -- Sender.hs (but here for more compact diagram)
+        aesendAppendEntriesResponse1; aesendAppendEntriesResponse2; aesendAppendEntriesResponse3;
+        aesendAppendEntriesResponse4; aesendAppendEntriesResponse5; aesendAllAppendEntriesResponse;
     cluster (Str "PureBox") $ do
         graphAttrs [Label (StrLabel "AE pure")]
         aehandleAppendEntries; myActiveAssignments; checkForNewLeader;
