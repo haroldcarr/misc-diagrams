@@ -46,15 +46,18 @@ mk "dataStructure"
    , ("commitIndex" , "commit\nIndex")
    , ("commitProof" , "commit\nProof")
    , ("commitProofF" , "commit\nProof")
+   , ("convinced", "convinced")
    , ("currentLeader" , "current\nLeader")
    , ("logEntries" , "log\nEntries")
    , ("logEntriesF" , "log\nEntries")
+   , ("lNextIndex", "lNextIndex")
    , ("membershipState", "membership\nState")
    , ("quorumSize" , "quorum\nSize")
    , ("recentAndTentativeStates", "rctTent\nStates")
    , ("replayMap", "replay\nMap")
    , ("replayMapF", "replay\nMap")
    , ("term", "term")
+   , ("timeSinceLastAER", "timeSince\nLastAER")
    ]
 
 mk "function"
@@ -150,7 +153,7 @@ mk "function"
    , ("requestVoteResponseH", "requestVoteResponseH")
    , ("revolutionH", "revolutionH")
 
-     --     Juno.Consensus.Handle.Command
+     -- Juno.Consensus.Handle.Command
    , ("handleSingleCommand", "handleSingleCommand")
    , ("commandHandle", "commandHandle")
    , ("commitAndPropagateCollector", "*")

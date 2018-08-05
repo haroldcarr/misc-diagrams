@@ -24,7 +24,7 @@ junoAER :: G.DotGraph L.Text
 junoAER = digraph (Str "junoAER") $ do
     cluster (Str "RaftStateBox") $ do
         graphAttrs [Label (StrLabel "RaftState")]
-        commitProof
+        commitProof; convinced; lNextIndex; timeSinceLastAER;
     cluster (Str "CommitHSBox") $ do
         graphAttrs [Label (StrLabel "Commit.hs")]
         doCommit
@@ -73,13 +73,22 @@ junoAER = digraph (Str "junoAER") $ do
     "handleReputableAER" --> "handleAEResponse"
     -------------------------
     -- Raft2
-    "aerCommitProof" --> "aermergeCommitProof"
-    "aerUCDeleteRET" --> "aermergeCommitProof"
+    "aerCommitProof"        --> "aermergeCommitProof"
+    "aerUCDeleteRET"        --> "aermergeCommitProof"
     "aerResetElectionTimer" --> "aermergeCommitProof"
-    "aerUPLNext" --> "aermergeCommitProof"
-    "aerUCInsertRET" --> "aermergeCommitProof"
-    "aermergeCommitProof" --> "commitProof"
-    "aermergeCommitProof" --> "doCommit"
+    "aerUPLNext"            --> "aermergeCommitProof"
+    "aerUCInsertRET"        --> "aermergeCommitProof"
+    "aermergeCommitProof"   --> "commitProof"
+    "aerUCDeleteRET"        --> "convinced"
+    "aerUCInsertRET"        --> "convinced"
+    "aerUPLNext"            --> "lNextIndex"
+
+    "aerUCDeleteRET"        --> "timeSinceLastAER"
+    "aerResetElectionTimer" --> "timeSinceLastAER"
+    "aerUPLNext"            --> "timeSinceLastAER"
+    "aerUCInsertRET"        --> "timeSinceLastAER"
+
+    "aermergeCommitProof"   --> "doCommit"
 
 ------------------------------------------------------------------------------
 
