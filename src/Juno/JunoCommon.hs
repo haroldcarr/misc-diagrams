@@ -218,3 +218,29 @@ mk "predicate"
    , ("casePreState", "case\nPreState")
    , ("validResponse", "valid\nResponse")
    ]
+
+------------------------------------------------------------------------------
+-- AppendEntriesResponse
+
+mk "dataStructure"
+   [ ("aerCommitProof", "ComPrf")
+   , ("aerUCDeleteRET", "ComPrf,\nUpCnvnc/Del,\nResetET")
+   , ("aerResetElectionTimer", "ComPrf,\nResetET")
+   , ("aerUPLNext", "ComPrf,\nUpLNxt,\nResetET")
+   , ("aerUCInsertRET", "ComPrf,\nUpCnvnc/Ins,\nResetET,\nUpLNxt")
+   ]
+
+mk "function"
+   [ -- pure
+     ("handleAEResponse", "handleAE\nResponse")
+     -- Raft
+   ]
+
+mk "predicate"
+   [ --  pure
+     ("aerisLeader", "leader?")
+   , ("caseConvincedSuccessTerm", "case\n(convinced,\nsuccess,\nterm)")
+     -- Raft
+   ]
+
+
