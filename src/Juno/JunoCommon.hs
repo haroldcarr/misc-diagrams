@@ -234,6 +234,12 @@ mk "function"
    [ -- pure
      ("handleAEResponse", "handleAE\nResponse")
      -- Raft
+   , ("aerhandle", "handle")
+   , ("aeramIActiveNow", "amIActiveNow")
+   , ("aerignore", "ignore")
+   , ("handleReputableAER", "handle\nReputable\nAER")
+   , ("evalRecoveryOnInactiveAER", "evalRecovery\nOnInactiveAER")
+   , ("aermergeCommitProof", "merge\nCommitProof")
    ]
 
 mk "predicate"
@@ -241,6 +247,12 @@ mk "predicate"
      ("aerisLeader", "leader?")
    , ("caseConvincedSuccessTerm", "case\n(convinced,\nsuccess,\nterm)")
      -- Raft
+   , ("aerIsActive", "active?")
+   , ("aerActiveInIndex", "active in\naerIndex?")
+   , ("aerActiveInIndexP1", "active in\naerIndex + 1?")
+   , ("insideCIP1", "inside\n(ci + 1)")
+   , ("fstActAsmntAfterCI", "1st\nactive\nAsmnt\nAfter\nCI")
+   , ("lbAAEqAERIndexP1", "lowerBound\nactive interval\n==\naerIndex + 1)")
    ]
 
 

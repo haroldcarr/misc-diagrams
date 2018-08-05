@@ -22,10 +22,19 @@ default (L.Text)
 
 junoAER :: G.DotGraph L.Text
 junoAER = digraph (Str "junoAER") $ do
-    cluster (Str "RaftStateBox") $
+    cluster (Str "RaftStateBox") $ do
         graphAttrs [Label (StrLabel "RaftState")]
-    cluster (Str "AERRaftStateBox") $
+        commitProof
+    cluster (Str "CommitHSBox") $ do
+        graphAttrs [Label (StrLabel "Commit.hs")]
+        doCommit
+    cluster (Str "AERRaftStateBox1") $ do
         graphAttrs [Label (StrLabel "AER RaftState")]
+        aerhandle; aeramIActiveNow; aerIsActive; aerActiveInIndex; aerActiveInIndexP1; aerignore;
+        insideCIP1; handleReputableAER; fstActAsmntAfterCI; lbAAEqAERIndexP1; evalRecoveryOnInactiveAER;
+    cluster (Str "AERRaftStateBox2") $ do
+        graphAttrs [Label (StrLabel "AER RaftState")]
+        aermergeCommitProof;
     cluster (Str "PureBox") $ do
         graphAttrs [Label (StrLabel "AER pure")]
         handleAEResponse; updateCommitProofMap; aerisLeader; caseConvincedSuccessTerm; aerCommitProof;
@@ -46,7 +55,31 @@ junoAER = digraph (Str "junoAER") $ do
     edge "caseConvincedSuccessTerm" "aerResetElectionTimer" [textLabel "(Cnv,Succ,OldReqTerm)"]
     edge "caseConvincedSuccessTerm" "aerResetElectionTimer" [textLabel "(_,_,NewReqTerm)"]
     -------------------------
-    -- Raft
+    -- Raft1
+    "aerhandle" --> "aeramIActiveNow"
+    "aeramIActiveNow" --> "aerIsActive"
+    edge "aerIsActive" "aerActiveInIndex" [textLabel "yes"]
+    edge "aerIsActive" "aerActiveInIndexP1" [textLabel "no"]
+    edge "aerActiveInIndex" "aerignore" [textLabel "no"]
+    edge "aerActiveInIndexP1" "aerignore" [textLabel "no"]
+    "aerActiveInIndex" --> "insideCIP1"
+    edge "insideCIP1" "aerignore" [textLabel "no"]
+    edge "insideCIP1" "handleReputableAER" [textLabel "yes"]
+    "aerActiveInIndexP1" --> "fstActAsmntAfterCI"
+    edge "fstActAsmntAfterCI" "aerignore" [textLabel "no"]
+    edge "fstActAsmntAfterCI" "lbAAEqAERIndexP1" [textLabel "yes"]
+    edge "lbAAEqAERIndexP1" "handleReputableAER" [textLabel "1"]
+    edge "lbAAEqAERIndexP1" "evalRecoveryOnInactiveAER" [textLabel "2"]
+    "handleReputableAER" --> "handleAEResponse"
+    -------------------------
+    -- Raft2
+    "aerCommitProof" --> "aermergeCommitProof"
+    "aerUCDeleteRET" --> "aermergeCommitProof"
+    "aerResetElectionTimer" --> "aermergeCommitProof"
+    "aerUPLNext" --> "aermergeCommitProof"
+    "aerUCInsertRET" --> "aermergeCommitProof"
+    "aermergeCommitProof" --> "commitProof"
+    "aermergeCommitProof" --> "doCommit"
 
 ------------------------------------------------------------------------------
 
