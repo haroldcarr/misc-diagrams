@@ -52,8 +52,8 @@ executable discrete
   default-language:    Haskell2010
 
 executable junoae
-  hs-source-dirs:      src/Juno
-  main-is:             JunoAE.hs
+  hs-source-dirs:      src/Juno/Consensus/Handle
+  main-is:             DAppendEntries.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
@@ -65,8 +65,8 @@ executable junoae
   default-language:    Haskell2010
 
 executable junoaer
-  hs-source-dirs:      src/Juno
-  main-is:             JunoAER.hs
+  hs-source-dirs:      src/Juno/Consensus/Handle
+  main-is:             DAppendEntries.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
@@ -91,8 +91,21 @@ executable junocmdcommit
   default-language:    Haskell2010
 
 executable junocommit
-  hs-source-dirs:      src/Juno
-  main-is:             JunoCommit.hs
+  hs-source-dirs:      src/Juno/Consensus
+  main-is:             DCommit.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , data-graphviz-hc-util
+                     , filepath
+                     , graphviz
+                     , misc-diagrams
+                     , template-haskell
+                     , text
+  default-language:    Haskell2010
+
+executable junocommand
+  hs-source-dirs:      src/Juno/Consensus/Handle
+  main-is:             DCommand.hs
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , data-graphviz-hc-util
