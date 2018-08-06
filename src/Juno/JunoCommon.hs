@@ -48,6 +48,8 @@ mk "dataStructure"
    , ("commitProofF" , "commit\nProof")
    , ("convinced", "convinced")
    , ("currentLeader" , "current\nLeader")
+   , ("lastCommitTime", "last\nCommit\nTime")
+   , ("lastCompleted", "last\nCompleted")
    , ("logEntries" , "log\nEntries")
    , ("logEntriesF" , "log\nEntries")
    , ("lNextIndex", "lNextIndex")
@@ -113,6 +115,7 @@ mk "function"
      -- Juno.Runtime.Sender
    , ("sendDummyCollector", "*")
    , ("sendRPC", "send\nRPC")
+   , ("sendRPCs", "send\nRPCs")
    , ("sendResults", "send\nResults")
    , ("sendAppendEntries", "send(All)\nAppendEntries")
    , ("sendAppendEntriesF", "send(All)\nAppendEntries")
@@ -256,6 +259,43 @@ mk "predicate"
    , ("insideCIP1", "inside\n(ci + 1)")
    , ("fstActAsmntAfterCI", "1st\nactive\nAsmnt\nAfter\nCI")
    , ("lbAAEqAERIndexP1", "lowerBound\nactive interval\n==\naerIndex + 1)")
+   ]
+
+------------------------------------------------------------------------------
+-- Commit
+
+mk "dataStructure"
+   [ -- pure
+     ("ccpRight", "Right\nIX.head.\ndrop (qsize-1)\nFE")
+     -- Raft
+   ]
+
+mk "function"
+   [ -- pure
+     ("cmtcheckCommitProof", "checkCommitProof")
+   , ("cmtfinalEvidence", "finalEvidence")
+   , ("filterEQCT", "termCheck: filter\n== crntTerm")
+   , ("filterGCIandLEQMaLI", "prepare: filter\n> cur Ix\n&& >= maxLogIx")
+   , ("hashChecks", "hashChecks: filter\nhash AER ==\nhash (lkup (IX AER) log)")
+   , ("sortByDownIx", "sortBy\nDown Ix")
+     -- Raft
+   , ("cmtdoCommit", "doCommit")
+   , ("cmtupdateCommitIndex", "update\nCommitIndex")
+   , ("qciGTci", "qci > ci")
+   , ("setcommitIndexToQCI", "commitIndex\n.= qci")
+   , ("filterQCILTaerIndex", "discard used evidenc\nfilter\n((qci <) . _aerIndex)")
+   , ("logCommitChange", "log\nCommit\nChange")
+   , ("getTime", "getTime")
+   , ("completeCommittedLogEntries", "complete\nCommitted\nLogEntries")
+   , ("getEntriesInLeftHalfOpenInterval", "getEntriesInLeft\nHalfOpenInterval")
+   , ("getAndSendResults", "getAndSendResults")
+   , ("completeCommand", "complete\nCommand")
+   , ("commitLogEntry","commit\nLogEntry")
+   ]
+
+mk "predicate"
+   [ --  pure
+     -- Raft
    ]
 
 
