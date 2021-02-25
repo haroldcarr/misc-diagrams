@@ -1,6 +1,7 @@
-resolver: lts-5.17
+resolver: lts-13.25
 packages:
 - '.'
 - '../data-graphviz-hc-util'
-extra-deps: [graphviz-2999.18.0.2]
+extra-deps:
+- graphviz-2999.20.1.0@sha256:fac315d1a260d1625a938e5164362b080c9110f02aa0a71b7b77b25173cf7e77,7703
 flags: {}
